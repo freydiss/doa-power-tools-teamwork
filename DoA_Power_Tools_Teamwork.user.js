@@ -26,17 +26,17 @@
 // @exclude       *://accounts.google.com/*
 // @exclude       *://talkgadget.google.com/*
 // @exclude       *://www.googleapis.com/static*
-// @version       2012.05.21a
+// @version       2012.05.22a_ALPHA
 // @icon          http://www.wackoscripts.com/icon.png
-// @changelog     <ul><li><b>Fixed</b> Waves attacks</li><li><b>Fixed</b> Training (my error - Sorry!)</li><li><b>Changed</b> The attack rates</li></ul>
+// @changelog     <ul><li>Randomise attack order.</li><li>Drop any targets protected by fog.</li></ul>
 // ==/UserScript==
 
 /********************************************************************************
  * INFORMATION                                                                  *
  *                                                                              *
  * Name: DoA Power Tools Teamwork                                               *
- * Version: 2012.05.17a                                        	    *
- * Last Modified: 21st May 2012 18:00  GMT+3                            	    *
+ * Version: 2012.05.22a                                        	    *
+ * Last Modified: 22st May 2012 19:00  GMT+1                            	    *
  * Original Authors: G.Jetson, Runey & Wham                                     *
  * Current  Authors: La Larva, Les, Runey, Lord Mimir, Wham, Didi & Jawz        *
  * Collaborators:                                                               *
@@ -152,10 +152,10 @@ var $J;
 var SCRIPT_NAME		= 'DoA Power Tools Teamwork';
 
 // Script Version: Year, Month, Day, Revision, Maturity (e.g. YYYY.MMDDa_BETA)
-var SCRIPT_VERSION	= '2012.05.21a';
+var SCRIPT_VERSION	= '2012.05.22a';
 
 // For Script Mod Authors  ex: (AuthorName Mod)
-var SCRIPT_MOD_BY	= '';
+var SCRIPT_MOD_BY	= 'LES..';
 
 // DoA API Version
 var API_VERSION		= 'rover';
@@ -12596,6 +12596,9 @@ Tabs.Attacks = {
 								t.dispFeedback(translate('Attack to') + ' ' + target_msg + ' ' + translate('failed')+' - ' + translate('Bandwidth Limit Exceeded') + '</b>,' + translate('Too many requests') + '! -  ' + translate('Retry in') +' '+ timeFormat(delay/1000));
 							}
 							else if ( r.errmsg ) {
+								if (/fog/.test(r.errmsg)){ // <== Test if return error message is fog, set target states attackable to false.
+                                    Map.states[target.x + ',' + target.y].attackable = false;}
+
 								verboseLog('<b>Attack</b> to ' + target_msg + ' delayed due to </b>' + r.errmsg + '</b>: retry in ' + timeFormat(delay/1000));
 
 								t.dispFeedback ( r.errmsg + ': ' + translate('Retry in') + ' ' + timeFormat(delay/1000) );
@@ -12781,6 +12784,7 @@ Tabs.Attacks = {
 		var last_attack = 0;
 		var next_target = null;
 		var target = null;
+		var now = serverTime();
 		
 		var map_type = options.map_type || Data.options.map.selected;
 		
@@ -12797,7 +12801,7 @@ Tabs.Attacks = {
 		// Look through all the targets
 		for (var i=0; i < t.targets.length; i++)
 		{
-			var target = t.targets[i];
+			var target = t.targets[Math.floor((Math.random()*(t.targets.length-i)))];
 			
 			// Skip a target if the units set for that level are not available ( by Lord Mimir )
 			if ( !level_enable[ target.level ] ){
@@ -12811,24 +12815,9 @@ Tabs.Attacks = {
 			{
 
 				// Has the target never been attacked?
-				if ( !target_states.last_attack || target_states.last_attack === 0 ) 
+				if ( !target_states.last_attack || target_states.last_attack === 0
+                     || target_states.last_attack < now - 3600 ) 
 				{
-					next_target = target;
-					break;
-				}
-				
-				else if ( last_attack === 0 )
-				{
-					// Yes, this target is next (so far)
-					last_attack = target_states.last_attack;
-					next_target = target;
-				}
-				
-				// Was the previous target attacked before this target?
-				else if (last_attack > target_states.last_attack) 
-				{
-					// Yes, this target is next (so far)
-					last_attack = target_states.last_attack;
 					next_target = target;
 					break;
 				}
