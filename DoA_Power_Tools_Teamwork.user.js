@@ -8507,21 +8507,21 @@ Marches = {
 			// Delete expired retreating marches or change status in expire marching
 
 
-	if ( march ){
-		if (march.run_at === undefined || now > march.run_at + 2 ) {
-			switch( march.status )
-				{
-	case 'marching':
-		march.run_at = now - 2 + march.duration !== undefined ? march.duration : delay_min;
-		march.status = 'retreating';
-		break;
-	case 'retreating':
-		Marches.remove( id, type );
-		continue;
-		break;
+			if ( march ){
+				if (march.run_at === undefined || now > march.run_at + 1 ) {
+					switch( march.status )
+					{
+					case 'marching':
+						march.run_at = now - 1 + march.duration !== undefined ? march.duration : delay_min;
+						march.status = 'retreating';
+						break;
+					case 'retreating':
+						Marches.remove( id, type );
+						continue;
+						break;
+					}
+				}
 			}
-		}
-	}
 
 			
 			// Add the current march if it's not in the Data.marches
@@ -8589,10 +8589,10 @@ Marches = {
 			if ( table_output[id] === undefined && (time_left || march.status==='encamped') ) {
 				
 				// Insert a new row
-				iRow = table.insertRow( -1 );
+				iRow = table.insertRow( 0 );
 				
 				// associates the current row number to the id of the march
-				table_output[id] = {row:table.rows.length-1};
+				table_output[id] = {};
 				
 				iRow.setAttribute( 'ref', id );
 				
@@ -8731,8 +8731,15 @@ Marches = {
 			
 				if( table_output[id] === undefined ) continue;
 			
-				iRow = table.rows[ table_output[id].row ];
-				
+				for ( var row = 0; row < table.rows.length; row++ )
+				{  
+					if ( table.rows[row].getAttribute('ref') == id )
+					{
+						iRow = table.rows[row];
+						break;
+					}
+				}
+
 				if( iRow === undefined )
 				{
 					delete table_output[id];
@@ -11413,73 +11420,75 @@ Tabs.Waves = {
 		t.$content.html ( html );
 		
 		
-function setUnitsTable ( table ) {
- var t = Tabs.Waves;
- var lableRow;
- var inputRow;
- var val, c=0;
- for (var i=0; i < t.units_type.length; i++)
- {
-  /*
-  if (getUnitNumbers(Seed.cities[0], t.units_type[i]).total < 1) {
-continue;
-  }
-  */
-  if (i%7 === 0) {
-labelRow = table.insertRow(-1);
-inputRow = table.insertRow(-1);
-c = 0;
-  }
-  var label = labelRow.insertCell(c);
-  //label.innerHTML = translate('~'+t.units_type[i]);
-  label.innerHTML = '<span class="' + UID['doa-icons'] + ' i-' + t.units_type[i] + '" style="margin-left:10px"></span>';
-  label.style.width  = '45px';
-  label.style.height = '20px';
-  label.title = translate( t.units_type[i] );
-  
-  var input = document.createElement ('input');
-  input.type = 'text';
-  input.size = '1';
-  input.style.width = '40px';
-  input.title = translate(t.units_type[i]);
-  
-  if (i < 2) {
-input.style.border = '1px solid black';
-  } else if (i < 9) {
-input.style.border = '1px solid green';
-  } else {
-input.style.border = '1px solid blue';
-  }
-  
-  input.maxlength = '6'; // Allow 100,000 units to be sent
-  
-  
-  if (Data.options.waves.units[t.units_type[i]] === undefined){
-Data.options.waves.units[t.units_type[i]] = 0;
-  }
-  val = Data.options.waves.units[t.units_type[i]];
-  
-  if (!val){ val = 0; }
-  
-  input.value = val;
-  input.setAttribute( 'ref', i );
-  
-  $J(input).change ( function ( event, ui ){
-var idx = $J(this).attr('ref');
-var unit_type = t.units_type[idx];
-Data.options.waves.units[unit_type] = event.target.value;
-  } );
-  
-  inputRow.insertCell(c).appendChild (input);
-  
-  c = c + 1;
-  
- }
-}		
+		function setUnitsTable ( table ) {
+			var t = Tabs.Waves;
+			var lableRow;
+			var inputRow;
+			var val, c=0;
+
+			for (var i=0; i < t.units_type.length; i++)
+			{
+				/*
+				if (getUnitNumbers(Seed.cities[0], t.units_type[i]).total < 1) {
+					continue;
+				}
+				*/
+				if (i%7 === 0) {
+					labelRow = table.insertRow(-1);
+					inputRow = table.insertRow(-1);
+					c = 0;
+				}
+				var label = labelRow.insertCell(c);
+				//label.innerHTML = translate('~'+t.units_type[i]);
+				label.innerHTML = '<span class="' + UID['doa-icons'] + ' i-' + t.units_type[i] + '" style="margin-left:10px"></span>';
+				label.style.width  = '45px';
+				label.style.height = '20px';
+				label.title = translate( t.units_type[i] );
+				
+				var input = document.createElement ('input');
+				input.type = 'text';
+				input.size = '1';
+				input.style.width = '40px';
+				input.title = translate(t.units_type[i]);
+				
+				if (i < 2) {
+					input.style.border = '1px solid black';
+				} else if (i < 9) {
+					input.style.border = '1px solid green';
+				} else {
+					input.style.border = '1px solid blue';
+				}
+				
+				input.maxlength = '6'; // Allow 100,000 units to be sent
+				
+				
+				if (Data.options.waves.units[t.units_type[i]] === undefined){
+					Data.options.waves.units[t.units_type[i]] = 0;
+				}
+				val = Data.options.waves.units[t.units_type[i]];
+				
+				if (!val){ val = 0;	}
+				
+				input.value = val;
+				input.setAttribute( 'ref', i );
+				
+				$J(input).change ( function ( event, ui ){
+					var idx = $J(this).attr('ref');
+					var unit_type = t.units_type[idx];
+					Data.options.waves.units[unit_type] = event.target.value;
+				} );
+				
+				inputRow.insertCell(c).appendChild (input);
+				
+				c = c + 1;
+				
+			}
+		}
+		
 	
 		function setDragonsTable (table) {
 			var t = Tabs.Waves;
-			var row = table.insertRow(-1);
+			var row;
 
 			var dragons = Data.options.waves.dragons;
 			
@@ -11491,7 +11500,7 @@ Data.options.waves.units[unit_type] = event.target.value;
 				if ( dragon_type == '' || dragon_type == 'SpectralDragon' || !Seed.dragons[ dragon_type ] ) continue;
 				if ( dragon_type == '' || dragon_type == 'ForestDragon' || !Seed.dragons[ dragon_type ] ) continue;
 				
-				if ( dragon_idx == 5 ) {
+				if ( dragon_idx%5 === 0 ) {
 					row = table.insertRow(-1);
 				}
 				
