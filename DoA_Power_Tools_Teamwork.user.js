@@ -12832,8 +12832,6 @@ Tabs.Attacks = {
 			// Is this target attackable?
 			if ( target_states && target_states.attackable )
 			{
-
-				// Has the target never been attacked?
 				if ( !target_states.last_attack || target_states.last_attack === 0
                      || target_states.last_attack < now - 2700 ) 
 				{
@@ -12844,22 +12842,23 @@ Tabs.Attacks = {
 		}
 
 		/* The user is not interested in wating for resources to restock, just find the oldest target */
-		if (next_target === null  && Data.options.attacks.wait_for_restock == true)
-		{
-			for (var i=0; i < t.targets.length; i++)
-			{
-				var target = t.targets[i]
-				if ( target_states && target_states.attackable )
-				{
-					if ( next_target === null )
-					{
-						next_target = target;
-					}
-					else
-					{
-						if ( target_states.last_attack < next_target.last_attack )
-						{
-							next_target = target;
+		if (next_target === null  && Data.options.attacks.wait_for_restock == true) {
+			var target_states;
+			for (var i=0; i < t.targets.length; i++) {
+				var candidate = t.targets[i]
+				if ( !level_enable[ candidate.level ] ){
+					continue;
+				}
+				var candidate_states = Map.states[ candidate.x + ',' + candidate.y ];
+
+				if ( candidate_states && candidate_states.attackable ) {
+					if ( target === null ) {
+						target_states = candidate_states;
+						next_target = candidate;
+					} else {
+						if ( candidate_states.last_attack < target_states.last_attack ) {
+							target_states = candidate_states;
+							next_target = candidate;
 						}
 					}
 				}
