@@ -4617,6 +4617,7 @@ function scriptStartUp()
 					,log_attacks			: true
 					,recall_encamped		: true
 					,stop_on_loss			: true
+                    ,wait_for_restock       : false
 					,units					: ['',{},{},{},{},{},{},{},{},{},{},{}]
 					
 					/*
@@ -12834,7 +12835,7 @@ Tabs.Attacks = {
 
 				// Has the target never been attacked?
 				if ( !target_states.last_attack || target_states.last_attack === 0
-                     || target_states.last_attack < now - 3600 ) 
+                     || target_states.last_attack < now - 2700 ) 
 				{
 					next_target = target;
 					break;
@@ -12842,6 +12843,28 @@ Tabs.Attacks = {
 			}
 		}
 
+		/* The user is not interested in wating for resources to restock, just find the oldest target */
+		if (next_target === null  && Data.options.attacks.wait_for_restock == true)
+		{
+			for (var i=0; i < t.targets.length; i++)
+			{
+				var target = t.targets[i]
+				if ( target_states && target_states.attackable )
+				{
+					if ( next_target === null )
+					{
+						next_target = target;
+					}
+					else
+					{
+						if ( target_states.last_attack < next_target.last_attack )
+						{
+							next_target = target;
+						}
+					}
+				}
+			}
+		}
 
 		// No target reaches the specified requirements
 		if ( next_target === null )	{
@@ -14523,6 +14546,10 @@ Tabs.Attacks = {
 		+'		<td>'+ translate('Stop if any troops lost') +':&nbsp;</td>'
 		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.stop_on_loss') +' '+ (Data.options.attacks.stop_on_loss?'CHECKED ':'') +' type=checkbox /></td>'
 		+'	</tr>'
+		+'	</tr><tr>'
+		+'		<td>'+ translate('Dont wait for camps to restock') +':&nbsp;</td>'
+		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.wait_for_restock') +' '+ (Data.options.attacks.wait_for_restock?'CHECKED ':'') +' type=checkbox /></td>'
+		+'	</tr>'
 		+'	<tr>'
 		+'		<td>'+ translate('Maximum simultaneous marches') +':&nbsp;</td>'
 		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.maximum') +' size=2 maxlength=2 type=text value="'+ Data.options.marches.maximum +'" /></td>'
@@ -14564,6 +14591,10 @@ Tabs.Attacks = {
 		
 		$J('#'+UID['Tabs.Attacks.tabOptions.stop_on_loss']).change(function ( event ) {
 			Data.options.attacks.stop_on_loss = event.target.checked;
+		});
+
+		$J('#'+UID['Tabs.Attacks.tabOptions.wait_for_restock']).change(function ( event ) {
+			Data.options.attacks.wait_for_restock = event.target.checked;
 		});
 		
 		$J('#'+UID['Tabs.Attacks.tabOptions.log_attacks']).change(function ( event ) {
