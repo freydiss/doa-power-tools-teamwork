@@ -12566,6 +12566,8 @@ Tabs.Attacks = {
 						
 							var delay_min = Data.options.attacks.delay_min;
 							var delay_max = Data.options.attacks.delay_max;
+							
+							delay = Math.randRange(delay_min*1000, delay_max*1000);
 
 							if ( Data.options.marches.requests.counter >= Data.options.marches.requests.max_per_hour )
 							{
@@ -12581,11 +12583,18 @@ Tabs.Attacks = {
 							}
 							else if ((Data.options.marches.requests.counter % 15) === 0)
 							{
-								delay = 45 * total_marches * 1000;
-								setTimeout(function(){t.dispFeedback(translate('Attacks stopped momentarily to prevent server blocking') + ' - ' + translate('waiting') + ': ' + timeFormat(delay/1000))}, delay_min*500 );
+								var time_offset = parseInt(serverTime() - Data.options.marches.requests.start_at);
+								if ( time_offset < 3600 )
+								{
+									if ( (time_offset / Data.options.marches.requests.counter) < (3600 / Data.options.marches.requests.max_per_hour) )
+									{
+										/* Attacks are being sent at a rate that will exceed the maximum per hour slow down. */
+										delay = 45 * total_marches * 1000;
+										setTimeout(function(){t.dispFeedback(translate('Attacks stopped momentarily to prevent server blocking') + ' - ' + translate('waiting') + ': ' + timeFormat(delay/1000))}, delay_min*500 );
+									}
+								}
 							}
 							else {
-								delay = Math.randRange(delay_min*1000, delay_max*1000);
 								setTimeout(function(){t.dispFeedback('')}, parseInt(delay/2) );
 							}
 							
