@@ -12852,7 +12852,7 @@ Tabs.Attacks = {
 				var candidate_states = Map.states[ candidate.x + ',' + candidate.y ];
 
 				if ( candidate_states && candidate_states.attackable ) {
-					if ( target === null ) {
+					if ( next_target === null ) {
 						target_states = candidate_states;
 						next_target = candidate;
 					} else {
