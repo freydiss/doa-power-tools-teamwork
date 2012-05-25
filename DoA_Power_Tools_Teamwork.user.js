@@ -26,7 +26,7 @@
 // @exclude       *://accounts.google.com/*
 // @exclude       *://talkgadget.google.com/*
 // @exclude       *://www.googleapis.com/static*
-// @version       2012.05.22a_ALPHA
+// @version       2012.05.25b
 // @icon          http://www.wackoscripts.com/icon.png
 // @changelog     <ul><li>Randomise attack order.</li><li>Drop any targets protected by fog.</li></ul>
 // ==/UserScript==
@@ -35,8 +35,8 @@
  * INFORMATION                                                                  *
  *                                                                              *
  * Name: DoA Power Tools Teamwork                                               *
- * Version: 2012.05.25a                                        	    *
- * Last Modified: 25th May 2012 11:00  GMT+3                            	    *
+ * Version: 2012.05.25b                                        	    *
+ * Last Modified: 25th May 2012 15:00  GMT+3                            	    *
  * Original Authors: G.Jetson, Runey & Wham                                     *
  * Current  Authors: La Larva, Les, Runey, Lord Mimir, Wham, Didi & Jawz        *
  * Collaborators:                                                               *
@@ -152,7 +152,7 @@ var $J;
 var SCRIPT_NAME		= 'DoA Power Tools Teamwork';
 
 // Script Version: Year, Month, Day, Revision, Maturity (e.g. YYYY.MMDDa_BETA)
-var SCRIPT_VERSION	= '2012.05.25a';
+var SCRIPT_VERSION	= '2012.05.25b';
 
 // For Script Mod Authors  ex: (AuthorName Mod)
 var SCRIPT_MOD_BY	= '';
@@ -3416,7 +3416,7 @@ $J("<style>").append('\
 	.i-armys {\
 		background-position:    -573px -186px;\
 	}\
-	.i-MomentaryTruce {\
+	.i-Momentary {\
 		background-position:    0px -306px;\
 	}\
 	.i-ArmisticeAgreement {\
@@ -3473,7 +3473,7 @@ $J("<style>").append('\
 	.i-RacechangeItem {\
 		background-position:  -78px -358px;\
 	}\
-	.i-FortunasTicket {\
+	.i-Ticket {\
 		background-position:    0px -375px;\
 	}\
 	.i-FortunasGoldenTicket {\
@@ -4617,7 +4617,7 @@ function scriptStartUp()
 					,log_attacks			: true
 					,recall_encamped		: true
 					,stop_on_loss			: true
-                    ,wait_for_restock       : false
+                    ,wait_for_restock       : true
 					,units					: ['',{},{},{},{},{},{},{},{},{},{},{}]
 					
 					/*
@@ -13862,6 +13862,12 @@ Tabs.Attacks = {
 			else if ( /(Helmet|ClawGuards|BodyArmor|TailGuard)/.test(name) ) {
 				objAddTo (Data.stats.items.armors, name, quantity); 
 			}
+			else if ( /(Porter|Conscript|Spy|Halberdsman|Minotaur|Longbowman|SwiftStrikeDragon|BattleDragon|ArmoredTransport|PackDragon|Giant|FireMirror|AquaTroop|StoneTroop|FireTroop|WindTroop|IceTroop|FrostGiant|SwampTroop|ForestTroop|DesertTroop)/.test(name) ) {
+				objAddTo (Data.stats.items.trooops, name, quantity); 
+			}
+			else if ( /(Ticket|Momentary)/.test(name) ) {
+				objAddTo (Data.stats.items.others, name, quantity); 
+			}
 			else {
 				objAddTo (Data.stats.items.general, name, quantity); 
 			}
@@ -13926,6 +13932,54 @@ Tabs.Attacks = {
 		html +=
 		 '		  </table>'
 		+'    </div>'
+		+'		</td>'
+		+'  </tr>'
+		+'  <tr valign=top>'
+		+'    <td style="width:50px">' + translate('Troops') +': </td>'
+		+'    <td>'
+		+'      <table class="' +UID['table'] + ' zebra">';
+		
+		// Tickets, Truce 
+		for (var name in Data.stats.items.trooops)
+		{
+			var per_hour = Data.stats.items.trooops[name] / run_time_fixed;
+			html += 
+			    '	  <tr align=right>'
+			   +'			<td style="width:155px">' 
+			   +'				<span>' + translate(name) + '</span>'
+			   +'				<span class="' + UID['doa-icons'] + ' i-' + name + '"></span>'
+			   +'			</td>'
+			   +'			<td style="width:100px">' + Data.stats.items.trooops[name].intToCommas() + '</td>'
+			   +'			<td style="width:100px">(' + per_hour.intToCommas() + ' /' + translate('h') + ')</td>'
+			   +'		</tr>';
+		}
+		
+		html +=
+		 '		  </table>'
+		+'		</td>'
+		+'  </tr>'
+		+'  <tr valign=top>'
+		+'    <td style="width:50px">' + translate('Items') +': </td>'
+		+'    <td>'
+		+'      <table class="' +UID['table'] + ' zebra">';
+		
+		// Tickets, Truce 
+		for (var name in Data.stats.items.others)
+		{
+			var per_hour = Data.stats.items.others[name] / run_time_fixed;
+			html += 
+			    '	  <tr align=right>'
+			   +'			<td style="width:155px">' 
+			   +'				<span>' + translate(name) + '</span>'
+			   +'				<span class="' + UID['doa-icons'] + ' i-' + name + '"></span>'
+			   +'			</td>'
+			   +'			<td style="width:100px">' + Data.stats.items.others[name].intToCommas() + '</td>'
+			   +'			<td style="width:100px">(' + per_hour.intToCommas() + ' /' + translate('h') + ')</td>'
+			   +'		</tr>';
+		}
+		
+		html +=
+		 '		  </table>'
 		+'		</td>'
 		+'  </tr>'
 		+'  <tr valign=top>'
