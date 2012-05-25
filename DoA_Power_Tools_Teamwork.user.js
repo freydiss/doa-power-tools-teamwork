@@ -158,7 +158,7 @@ var SCRIPT_VERSION	= '2012.05.22a';
 var SCRIPT_MOD_BY	= 'LES..';
 
 // DoA API Version
-var API_VERSION		= 'rover';
+var API_VERSION		= 'spinal';
 
 // Generates an ID from the name of the script to be used when data is stored in 
 // localStorage to prevent overlap of data between different scripts
