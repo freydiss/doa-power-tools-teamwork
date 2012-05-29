@@ -17611,7 +17611,10 @@ Tabs.Options = {
 			});
 			setTimeout ( function () {
 				var json_data = '{"map":'+ JSON.stringify( Data.map ) + '}';
-				window.open('data:application/text;base64,' + Base64.encode( json_data ),'Backup Map','width=300,height=200,toolbar=0,resizable=0');
+				downloadDataURI({
+        			filename: "map_realm"+SERVER_ID+"_"+d.toISOString()+".txt", 
+        			data: "data:application/text;base64,"+Base64.encode( json_data )
+				});
 			}, 1000);
 		}
 		
