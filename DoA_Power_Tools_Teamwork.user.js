@@ -17596,8 +17596,7 @@ Tabs.Options = {
 				}
 				json_data += '}';
 				downloadDataURI({
-        			filename: SERVER_ID+"_"+Date().toISOString()+".txt", 
-					url:"http://wackoscripts.com",
+        			filename: "realm"+SERVER_ID+"_"+d.toISOString()+".txt", 
         			data: "data:application/text;base64,"+Base64.encode( json_data )
 				});
 			}, 1000);
