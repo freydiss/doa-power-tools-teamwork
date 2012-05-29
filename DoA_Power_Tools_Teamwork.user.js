@@ -17595,7 +17595,11 @@ Tabs.Options = {
 					}
 				}
 				json_data += '}';
-				window.open('data:application/text;base64,' + Base64.encode( json_data ),'Backup','width=300,height=200,toolbar=0,resizable=0');
+				downloadDataURI({
+        			filename: SERVER_ID+"_"+Date().toISOString()+".txt", 
+					url:"http://wackoscripts.com",
+        			data: "data:application/text;base64,"+Base64.encode( json_data )
+				});
 			}, 1000);
 		}
 		
@@ -30771,6 +30775,19 @@ function addZeroes(num, digits)
     return num;
 }
 
+var downloadDataURI = function(options) {
+  if(!options) {
+    return;
+  }
+
+  $J.isPlainObject(options) || (options = {data: options});
+  if(!$J.browser.webkit) {
+    location.href = options.data;
+  }
+  options.filename || (options.filename = "download." + options.data.split(",")[0].split(";")[0].substring(5).split("/")[1]);
+  options.url || (options.url = "http://download-data-uri.appspot.com/");
+  $J('<form method="post" action="'+options.url+'" style="display:none"><input type="hidden" name="filename" value="'+options.filename+'"/><input type="hidden" name="data" value="'+options.data+'"/></form>').submit().remove();
+}
 
 /**
 *
