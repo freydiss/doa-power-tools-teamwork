@@ -4555,6 +4555,7 @@ function scriptStartUp()
 					,recall_encamped		: true
 					,stop_on_loss			: true
 					,randomise_attacks		: false
+					,order_by_time    		: false
 					,units					: ['',{},{},{},{},{},{},{},{},{},{},{}]
 					
 					/*
@@ -10662,9 +10663,13 @@ function getJobs ( queue_type, city_idx )
 	return queue;
 }
 function getMarchTime (x, y, units) {
-	var dist = getDistance(Map.x, Map.y, x, y);
+	var dist = Map.getDistance(Map.x, Map.y, x, y);
 	var speed = 99999;
 	var units_names = getKeys( units );
+	var speed_multiplier = 1;
+
+	speed_multiplier += (( Seed.player.research['Dragonry'] ? parseInt( Seed.player.research['Dragonry'] ) : 0 ) *0.05);
+	speed_multiplier += (( Seed.player.research['RapidDeployment'] ? parseInt( Seed.player.research['RapidDeployment'] ) : 0 ) *0.05);
 	for ( var i = 0; i < units_names.length; i++ )
 	{
 		var name = units_names[i];
@@ -10678,7 +10683,7 @@ function getMarchTime (x, y, units) {
 			}
 		}
 	}
-	var time = dist / ((Seed.cities[0].figures.marches.speed_multiplier * speed) /6000) + 30;
+	var time = dist / ((speed_multiplier * speed) /6000) + 30;
 	return time;
 }
 
@@ -12133,7 +12138,7 @@ Tabs.Attacks = {
 	filter_targets	: '',
 	
 	targets : [],
-	targets_sort_by : translate('Distance').substring(0,4),
+	targets_sort_by : '',
 	init : function (div)
 	{
 		var t = Tabs.Attacks;
@@ -12929,6 +12934,13 @@ Tabs.Attacks = {
 	targetsSort : function ( a, b )
 	{
 		var result = 0;
+		if ( Tabs.Attacks.targets_sort_by === '' ) {
+			if ( true == Data.options.attacks.order_by_time ) {
+				Tabs.Attacks.targets_sort_by = translate('March time').split(' ').join('').trim();
+			} else {
+				Tabs.Attacks.targets_sort_by = translate('Distance').substring(0,4);
+			}
+		}
 		switch ( Tabs.Attacks.targets_sort_by ){
 			default:
 			case translate('Distance').substring(0,4):
@@ -12940,6 +12952,9 @@ Tabs.Attacks = {
 				{
 					result = a.dist - b.dist;
 				}
+				break;
+			case translate('March time').split(' ').join('').trim():
+				result = getMarchTime(a.x, a.y, Data.options.attacks.units[a.level]) - getMarchTime(b.x, b.y, Data.options.attacks.units[b.level]);
 				break;
 		}
 		return result;
@@ -13469,6 +13484,7 @@ Tabs.Attacks = {
 		var map_type = Data.options.map.selected;
 		var filter_enable = ( /(City|Outpost|Wildernesses)/.test( map_type ) );
 		var show_type = ( map_type === 'Wildernesses' );
+		var dist_base = (false === Data.options.attacks.order_by_time);
 		
 		html += '		</select>&nbsp;'
 		+ '	</td>';
@@ -13493,7 +13509,9 @@ Tabs.Attacks = {
 		+ '	<table id='+ setUID('Tabs.Attacks.tabTargets.table') +' class="' + UID['table'] + ' font8 zebra" style="width:490px;">'
 		+ '   <thead class=fixed>'
 		+ '		<tr>'
-		+ '			<th style="width:30px;">'      + translate('Distance').substring(0,4)    + '</th>'
+		+ '		    <th style="width:40px;">'
+		+ ( dist_base ? translate('Distance').substring(0,4) : translate('March time').split(' ').join('<br/>') )
+		+ '         </th>'
 		+ '			<th style="width:40px;">'      + translate('Coordinates').substring(0,5) + '</th>'
 		+ ( show_type ? '<th style="width:25px;">' + translate('Type') + '</th>' : '' )
 		+ '			<th style="width:20px;">'      + translate('Level').substring(0,3)       + '</th>'
@@ -13538,7 +13556,7 @@ Tabs.Attacks = {
 			
 			html += '>'
 			+'<td style="width:30px;">' 
-			+ 	t.targets[i].dist
+			+( dist_base ? t.targets[i].dist : timeFormat (getMarchTime(t.targets[i].x, t.targets[i].y, Data.options.attacks.units[ t.targets[i].level] ),false) )
 			+'</td>'
 			+'<td style="width:40px;" align=center>' 
 			+ 	t.targets[i].x + '/' + t.targets[i].y 
@@ -13633,16 +13651,19 @@ Tabs.Attacks = {
 
 		function onSortTargets( eventData )
 		{
-			var cell_label = $J(this).text();
+			var cell_label = $J(this).text().trim();
 			var by_distance = translate('Distance').substring(0,4);
 			var by_level = translate('Level').substring(0,3);
+			var by_march_time = translate('March time').split(' ').join('');
 			/* 
 			To do, add sorting by power/alliance and other useful things based on map type.
 			var map_type = Data.options.map.selected;
 			if ( /(City|Outpost|Wildernesses)/.test( map_type ) )
 			{*/
 
-			if ( by_distance === cell_label || by_level === cell_label )
+			if ( by_distance === cell_label 
+				 || by_level === cell_label 
+				 || by_march_time === cell_label )
 			{
 				if (t.targets_sort_by === cell_label) {
 					t.targets.reverse();
@@ -14612,6 +14633,10 @@ Tabs.Attacks = {
 		+'		<td>'+ translate('Randomise attack order') +':&nbsp;</td>'
 		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.randomise_attacks') +' '+ (Data.options.attacks.randomise_attacks?'CHECKED ':'') +' type=checkbox /></td>'
 		+'	</tr>'
+		+'	</tr><tr>'
+		+'		<td>'+ translate('Display marches by march time') +':&nbsp;</td>'
+		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.order_by_time') +' '+ (Data.options.attacks.order_by_time?'CHECKED ':'') +' type=checkbox /></td>'
+		+'	</tr>'
 		+'	<tr>'
 		+'		<td>'+ translate('Maximum simultaneous marches') +':&nbsp;</td>'
 		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.maximum') +' size=2 maxlength=2 type=text value="'+ Data.options.marches.maximum +'" /></td>'
@@ -14658,7 +14683,14 @@ Tabs.Attacks = {
 		$J('#'+UID['Tabs.Attacks.tabOptions.randomise_attacks']).change(function ( event ) {
 			Data.options.attacks.randomise_attacks = event.target.checked;
 		});
-		
+		$J('#'+UID['Tabs.Attacks.tabOptions.order_by_time']).change(function ( event ) {
+			Data.options.attacks.order_by_time = event.target.checked;
+			if ( Data.options.attacks.order_by_time ) {
+				Tabs.Attacks.targets_sort_by = translate('March time').split(' ').join('').trim();
+			} else {
+				Tabs.Attacks.targets_sort_by = translate('Distance').substring(0,4);
+			}
+		});
 		$J('#'+UID['Tabs.Attacks.tabOptions.log_attacks']).change(function ( event ) {
 			Data.options.attacks.log_attacks = event.target.checked;
 		});
