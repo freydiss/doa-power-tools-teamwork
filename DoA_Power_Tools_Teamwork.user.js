@@ -460,6 +460,7 @@ var DRAGON_OBJ_ID = [
 	'Swamp_Dragon',
 	'Forest_Dragon',
 	'Desert_Dragon',
+	'',
 	'Spectral_Dragon'
 ];
 
@@ -4553,7 +4554,7 @@ function scriptStartUp()
 					,log_attacks			: true
 					,recall_encamped		: true
 					,stop_on_loss			: true
-                    ,wait_for_restock       : true
+					,randomise_attacks		: false
 					,units					: ['',{},{},{},{},{},{},{},{},{},{},{}]
 					
 					/*
@@ -12132,7 +12133,7 @@ Tabs.Attacks = {
 	filter_targets	: '',
 	
 	targets : [],
-	
+	targets_sort_by : translate('Distance').substring(0,4),
 	init : function (div)
 	{
 		var t = Tabs.Attacks;
@@ -12773,51 +12774,58 @@ Tabs.Attacks = {
 		}
 
 		// Look through all the targets
-		for (var i=0; i < t.targets.length; i++)
-		{
-			var target = t.targets[Math.floor((Math.random()*(t.targets.length-i)))];
-			
-			// Skip a target if the units set for that level are not available ( by Lord Mimir )
-			if ( !level_enable[ target.level ] ){
-				continue;
-			}
-			
-			var target_states = Map.states[ target.x + ',' + target.y ];
-			
-			// Is this target attackable?
-			if ( target_states && target_states.attackable )
+		if ( Data.options.attacks.randomise_attacks == true ){
+			for (var i=0; i < t.targets.length; i++)
 			{
+				var target = t.targets[Math.floor((Math.random()*(t.targets.length-i)))];
+				// Skip a target if the units set for that level are not available ( by Lord Mimir )
+				if ( !level_enable[ target.level ] ){
+					continue;
+				}
+			
+				var target_states = Map.states[ target.x + ',' + target.y ];
+				// Is this target attackable?
+				if ( target_states && target_states.attackable )
+				{
+					// Has the target never been attacked?
+					if ( !target_states.last_attack || target_states.last_attack === 0
+	                     || target_states.last_attack < now - 3600 ) 
+					{
+						next_target = target;
+						break;
+					}
+				}
+			}
+		} else {
+			// Look through all the targets
+			for (var i=0; i < t.targets.length; i++)
+			{
+				var target = t.targets[i];
+				// Skip a target if the units set for that level are not available ( by Lord Mimir )
+				if ( !level_enable[ target.level ] ){
+					continue;
+				}
 
+				var target_states = Map.states[ target.x + ',' + target.y ];
 				// Has the target never been attacked?
-				if ( !target_states.last_attack || target_states.last_attack === 0
-                     || target_states.last_attack < now - 2700 ) 
+				if ( !target_states.last_attack || target_states.last_attack === 0 )
 				{
 					next_target = target;
 					break;
 				}
-			}
-		}
-
-		/* The user is not interested in wating for resources to restock, just find the oldest target */
-		if (next_target === null  && Data.options.attacks.wait_for_restock == true) {
-			var target_states;
-			for (var i=0; i < t.targets.length; i++) {
-				var candidate = t.targets[i]
-				if ( !level_enable[ candidate.level ] ){
-					continue;
+				else if ( last_attack === 0 )
+				{
+					// Yes, this target is next (so far)
+					last_attack = target_states.last_attack;
+					next_target = target;
 				}
-				var candidate_states = Map.states[ candidate.x + ',' + candidate.y ];
-
-				if ( candidate_states && candidate_states.attackable ) {
-					if ( next_target === null ) {
-						target_states = candidate_states;
-						next_target = candidate;
-					} else {
-						if ( candidate_states.last_attack < target_states.last_attack ) {
-							target_states = candidate_states;
-							next_target = candidate;
-						}
-					}
+				// Was the previous target attacked before this target?
+				else if (last_attack > target_states.last_attack)
+				{
+					// Yes, this target is next (so far)
+					last_attack = target_states.last_attack;
+					next_target = target;
+					break;
 				}
 			}
 		}
@@ -12911,11 +12919,30 @@ Tabs.Attacks = {
 		}
 		
 		// Sort targets list by distance
-		targets.sort( function(a,b){return a.dist - b.dist;} );
+		targets.sort( Tabs.Attacks.targetsSort );
 		
 		t.targets = targets;
 		
 		return targets;
+	},
+	
+	targetsSort : function ( a, b )
+	{
+		var result = 0;
+		switch ( Tabs.Attacks.targets_sort_by ){
+			default:
+			case translate('Distance').substring(0,4):
+				result = a.dist - b.dist;
+				break;
+			case translate('Level').substring(0,3):
+				result = a.level - b.level;
+				if ( result == 0 )
+				{
+					result = a.dist - b.dist;
+				}
+				break;
+		}
+		return result;
 	},
 
 	checkAttack : function ( target, callback )
@@ -13569,6 +13596,7 @@ Tabs.Attacks = {
 	
 		// Add the event listeners
 		$J('#'+UID['Tabs.Attacks.tabTargets.selectMap']).change( onMapChoice );
+		$J('#'+UID['Tabs.Attacks.tabTargets.table']+' th').click( onSortTargets );
 		
 		$J('#'+UID['Tabs.Attacks.tabTargets.filter']).change(function(event) {
 			
@@ -13601,6 +13629,29 @@ Tabs.Attacks = {
 				$J('#'+UID['Tabs.Attacks.tabTargets.toggle_btn_'+ i]).click ( toggleAttackable );
 			}
 			setButtonStyle ( but_attack, t.targets[i].attackable );
+		}
+
+		function onSortTargets( eventData )
+		{
+			var cell_label = $J(this).text();
+			var by_distance = translate('Distance').substring(0,4);
+			var by_level = translate('Level').substring(0,3);
+			/* 
+			To do, add sorting by power/alliance and other useful things based on map type.
+			var map_type = Data.options.map.selected;
+			if ( /(City|Outpost|Wildernesses)/.test( map_type ) )
+			{*/
+
+			if ( by_distance === cell_label || by_level === cell_label )
+			{
+				if (t.targets_sort_by === cell_label) {
+					t.targets.reverse();
+				} else {
+					t.targets_sort_by = cell_label;
+					t.targets.sort(t.targetsSort);
+				}
+				t.tabTargets();
+			}
 		}
 		
 		function setButtonStyle (element, enabled) 
@@ -14558,8 +14609,8 @@ Tabs.Attacks = {
 		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.stop_on_loss') +' '+ (Data.options.attacks.stop_on_loss?'CHECKED ':'') +' type=checkbox /></td>'
 		+'	</tr>'
 		+'	</tr><tr>'
-		+'		<td>'+ translate('Dont wait for camps to restock') +':&nbsp;</td>'
-		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.wait_for_restock') +' '+ (Data.options.attacks.wait_for_restock?'CHECKED ':'') +' type=checkbox /></td>'
+		+'		<td>'+ translate('Randomise attack order') +':&nbsp;</td>'
+		+'		<td><input id='+ setUID('Tabs.Attacks.tabOptions.randomise_attacks') +' '+ (Data.options.attacks.randomise_attacks?'CHECKED ':'') +' type=checkbox /></td>'
 		+'	</tr>'
 		+'	<tr>'
 		+'		<td>'+ translate('Maximum simultaneous marches') +':&nbsp;</td>'
@@ -14604,8 +14655,8 @@ Tabs.Attacks = {
 			Data.options.attacks.stop_on_loss = event.target.checked;
 		});
 
-		$J('#'+UID['Tabs.Attacks.tabOptions.wait_for_restock']).change(function ( event ) {
-			Data.options.attacks.wait_for_restock = event.target.checked;
+		$J('#'+UID['Tabs.Attacks.tabOptions.randomise_attacks']).change(function ( event ) {
+			Data.options.attacks.randomise_attacks = event.target.checked;
 		});
 		
 		$J('#'+UID['Tabs.Attacks.tabOptions.log_attacks']).change(function ( event ) {
