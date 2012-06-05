@@ -1,4 +1,4 @@
-﻿﻿
+﻿﻿﻿
 // ==UserScript==
 // @name          DoA Power Tools Teamwork
 // @namespace     http://userscripts.org/scripts/show/124689
@@ -26,17 +26,17 @@
 // @exclude       *://accounts.google.com/*
 // @exclude       *://talkgadget.google.com/*
 // @exclude       *://www.googleapis.com/static*
-// @version       2012.05.25b
+// @version       2012.06.02a
 // @icon          http://www.wackoscripts.com/icon.png
-// @changelog     <ul><li>Randomise attack order.</li><li>Drop any targets protected by fog.</li></ul>
+// @changelog     <ul><li><b>Fixed</b> Added the Spectral Outpost Research items (will always show now)</li></ul>
 // ==/UserScript==
 
 /********************************************************************************
  * INFORMATION                                                                  *
  *                                                                              *
  * Name: DoA Power Tools Teamwork                                               *
- * Version: 2012.05.25b                                        	    *
- * Last Modified: 25th May 2012 15:00  GMT+3                            	    *
+ * Version: 2012.06.02a			                                        	    *
+ * Last Modified: 2nd June 2012 15:00  GMT+3                            	    *
  * Original Authors: G.Jetson, Runey & Wham                                     *
  * Current  Authors: La Larva, Les, Runey, Lord Mimir, Wham, Didi & Jawz        *
  * Collaborators:                                                               *
@@ -152,7 +152,7 @@ var $J;
 var SCRIPT_NAME		= 'DoA Power Tools Teamwork';
 
 // Script Version: Year, Month, Day, Revision, Maturity (e.g. YYYY.MMDDa_BETA)
-var SCRIPT_VERSION	= '2012.05.25b';
+var SCRIPT_VERSION	= '2012.06.02a';
 
 // For Script Mod Authors  ex: (AuthorName Mod)
 var SCRIPT_MOD_BY	= '';
@@ -223,7 +223,6 @@ function preparePage() {
 				$J('#contentCol').css('background','transparent');
 				$J('body').css('background', '#888 url(https://kabam1-a.akamaihd.net/wwwkabam/cdn/sites/doa/img/bg_doa.jpg)');
 				break;
-				
 			case 'google' :
 				$J(".Pca").css('display', 'none');
 				$J("#ozIdRtRibbonChatRoster").css('display','none');
@@ -238,15 +237,12 @@ function preparePage() {
 				
 			case 'kabam' :
 				$J(iframe).css({width:'100%',margin:'0',border:'0',backgroundColor:'transparent'});
-				break;
-				
+				break;				
 				case 'kongregate' :
 				$J(".chatholder").css('display', 'none');
 				$J(".adjusted").css('display', 'none');
 				$J("#maingame").css({width:'1235px'});
 				$J('#gameiframe').css({width:'1235px'});
-
-
 				$J('#maingamecontent.tbody').css({float:'left'});
 				
 				break;
@@ -293,6 +289,7 @@ function preparePage() {
 			case 'google' :
 				$J('#pane_hd').css('display', 'none');
 				$J('body').css('background', 'transparent');
+				$J(".ZI35oe").css('padding', 'none');
 				$J('body').css('background', '#888 url(https://kabam1-a.akamaihd.net/wwwkabam/cdn/sites/doa/img/bg_doa.jpg)');
 				break;
 			case 'kabam' :
@@ -463,7 +460,6 @@ var DRAGON_OBJ_ID = [
 	'Swamp_Dragon',
 	'Forest_Dragon',
 	'Desert_Dragon',
-	'',
 	'Spectral_Dragon'
 ];
 
@@ -797,7 +793,6 @@ case 'fr':
 	'Action Logs':'Logs Actions',
 	'Actions':'Actions',
 	'and':'et',
-
 	'at':'à',
 	'Attack One Target in Waves':'Attaquer une cible par vagues',
 	'Attack sent to':'Attaque envoyée vers',
@@ -1327,6 +1322,7 @@ case 'pl':
 	'fire_dragon outpost':'Fire Outpost',
 	'wind_dragon outpost':'Wind Outpost',
 	'ice_dragon outpost':'Ice Outpost',
+	'swamp_dragon outpost':'Sunken Temple',
 	'spectral_dragon outpost':'Spectral Outpost',
 	'Permanent Data':'Stale Danych',
 	'Please wait':'Proszę czekać',
@@ -1522,45 +1518,27 @@ case 'ru':
 case 'tt':
 	LANG_OBJECT = {
 	'above the first value':'больше первого значения', 
-
-
 	'Action Logs':'Журнал действий', 
 	'Actions':'Действия', 
 	'and':'и', 
 	'at':'в', 
 	'Attack One Target in Waves':'Атаковать одну цель волнами', 
-
-
-
-
 	'Attack sent to':'Войска атакуют', 
 	'Attacking':'Атака', 
 	'Attacks Configuration':'Настройка атак', 
 	'Attacks Stats':'Статистика атак', 
 	'Attacks stopped momentarily to prevent server blocking':'Атаки приостановлены для предотвращения блокировок сервером', 
-
-
 	'Attacks':'Атаки', 
 	'Attacks':'Атаки', 
 	'Auto Refresh every':'Автообновление каждые', 
-
 	'Automatically':'Автоматически', 
 	'Awaiting task completion notification':'Ожидание результатов задания', 
-
-
-
 	'Bandwidth Limit Exceeded':'Пропускная способность Превышен предел',
 	'Building':'Строительство', 
 	'Busy':'Занято', 
 	'by':' ', 
 	'Charging':'погрузка',
 	'Cities': 'Города',
-
-
-
-
-
-
 	'Clear last attack on all maps':'Очистка время атак на всех картах', 
 	'Clear last attack on current map':'Очистка время атак на этой карте', 
 	'Config':'Конфигурация', 
@@ -1568,69 +1546,47 @@ case 'tt':
 	'Console':'Консоль', 
 	'Coordinates':'Координаты', 
 	'd':'дн.', /*abbr Day*/ 
-
 	'Days':'Дней', 
 	'Delay Between Attacks':'Пауза между атаками', 
 	'Depending on available population':'Минимально по населению', 
 	'Depending on available resources':'Минимально по ресурсам', 
 	'Disabled':'Выключено', 
 	'Distance must be between':'Расстояние должно быть между', 
-
 	'Distance':'Расстояние', 
 	'Dont flag Wildernesses':'Dont flag Wildernesses', 
-
 	'Enable':'Включить', 
 	'Enabled':'Включено', 
 	'Error':'Ошибка', 
 	'First value must be between':'Первое значение должно быть между', 
-
 	'Full':'Полный', 
 	'Game Options':'Настройки игры', 
-
 	'Going to the coords':'Переход на координаты', 
 	'h':'ч', /*abbr Hour*/ 
-
-
-
 	'Hiding':'Скрыты', 
 	'Hour':'Час', 
 	'Hours':'Часов', 
 	'Info':'Инф.', 
-
-
 	'Invalid Date From':'Неправильная дата', 
 	'Invalid Date To':'Неправильная дата', 
 	'Invalid delays':'Неправильная пауза', 
-
-
-
 	'Invalid number of troops':'Не корректное число войск', 
 	'Invalid Range Date':'Неправильная дата', 
 	'Last Attack':'Последняя атака', 
 	'Loaded':'Загружено', 
-
 	'Logs':'Журнал', 
 	'm':'мин', /*abbr Minute*/ 
-
 	'Manual attack sent to':'Ручная отправка войск', 
 	'Maximum simultaneous marches':'Максимум одновременных атак', 
-
-
 	'miles':'клеток', 
 	'Minutes':'Минут', 
 	'No targets or troops available':'Нет доступных целей или войск', 
-
 	'No troops available':'Не хватает войск', 
 	'No Troops Defined':'Не указаны войска', 
-
-
-
 	'Not enough':'Не хватает', 
 	'Not':'Не', 
 	'of inactivity':'бездействия', 
 	'of':' ', 
 	'Opening the map on the last position':'Открытие карты на последней позиции', 
-
 	'Options':'Настройки', 
 	'water_dragon outpost':'Аутпост 1', 
 	'stone_dragon outpost':'Аутпост 2', 
@@ -1639,12 +1595,6 @@ case 'tt':
 	'ice_dragon outpost':'Аутпост 5', 
 	'spectral_dragon outpost':'Spectral Outpost',
 	'Permanent Data':'Permanent Data', 
-
-
-
-
-
-
 	'Please wait':'Пожалуйста, подождите',
 	'Preparing Attack':'Подготовка к атаке', 
 	'Refresh':'Обновить', 
@@ -1654,8 +1604,6 @@ case 'tt':
 	's':'сек', /*abbr Seconds*/ 
 	'Safe Mode':'Безопасный режим', 
 	'Scanning Map':'Сканирование карты радиусом $NUM$ клеток BR> Это займет немного времени', 
-
-
 	'Script Options':'Настройки скрипта', 
 	'Search Radius':'Диапазон поиска', 
 	'Second value must be at least':'второе значение должно быть больше', 
@@ -1663,31 +1611,22 @@ case 'tt':
 	'Send Dragon every certain number of waves':'Посылать Дракона в волну', 
 	'spectral_dragon outpost':'Spectral Outpost',
 	'Start Date':'Дата начала', 
-
-
 	'Starting soon':'Начиная скоро',
 	'Stop if any troops lost':'Остановить при потере войск', 
 	'Successfully':'Успешно', 
-
 	'Summary':'Итог', 
 	'Targets':'Цели', 
 	'Task Completed':'Задача выполнена', 
-
 	'Tasks':'Задания', 
 	'Too many errors, disabling auto train':'Много ошибок, отключение автообучения',
 	'Too many requests':'Mного запросов',
-
-
-
 	'Too many troops for muster point level':'Много войск для текущего уровня военкомата', 
 	'Training Configuration':'Настройки автообучения войск', 
 	'Training queue':'Очередь обучения', 
 	'Troops for Wave Attack':'Войска для атаки волнами', 
-
 	'Troops lost':'Потери войск', 
 	'Troops Not Defined':'Войска не указаны', 
 	'Use the Levels Tab to select attack areas':'Укажите цели для атаки на вкладке уровней', 
-
 	'Userset maximum marches reached':'Достигнуто максимально указанное число атак',
 	'Verbose logging':'Подробный журнал', 
 	'waiting':'ожидание', 
@@ -1695,7 +1634,6 @@ case 'tt':
 	'Wave attack to':'Атаковать волнами', 
 	'Wave':'Волна', 
 	'Window drag':'Двигать окно', 
-
 	'Withdraw troops if they are encamped':'Отзывать войска при захвате поля', 
 	'~AquaTroop':'FT',			/* Abbreviation (max. 8 characters) */ 
 	'~ArmoredTransport':'AT',	/* Abbreviation (max. 8 characters) */ 
@@ -1717,11 +1655,11 @@ case 'tt':
 	'~StoneTroop':'Ogre',		/* idem */ 
 	'~SwiftStrikeDragon':'SSD',	/* idem */
 	'~SwampDragon':'SwaDrg',	/* idem */	
+	'~ForestDragon':'ForDrg',	/* idem */
 	'~SwampTroop':'Venom',		/* idem */	
 	'~WaterDragon':'WatDrg',	/* idem */ 
 	'~WindDragon':'WndDrg',		/* idem */ 
 	'~WindTroop':'Banshee',		/* idem */ 
-	'~SwampTroop':'Venom',		/* idem */ 
 	'~Zzz':'Zzz' 
 	};
 	break;
@@ -1866,10 +1804,10 @@ default:
 	'water_dragon outpost':'Water Outpost',
 	'stone_dragon outpost':'Stone Outpost',
 	'fire_dragon outpost':'Fire Outpost',
-	'forest_dragon outpost':'GAEA Spring',
 	'wind_dragon outpost':'Wind Outpost',
 	'ice_dragon outpost':'Ice Outpost',
 	'swamp_dragon outpost':'Sunken Temple',
+	'forest_dragon outpost':'Gaea Spring',
 	'spectral_dragon outpost':'Spectral Outpost',
 	'Scanning Map':'Scanning map within $NUM$ miles<BR>This should take about a minute',
 	'~AquaTroop':'Fang',			/* Abbreviation (max. 8 characters) */
@@ -1903,7 +1841,6 @@ default:
 	'~WindTroop':'Banshee',			/* idem */
 	'~IceTroop':'Reaper',			/* idem */
 	'~Zzz':'Zzz'
-
 	};
 }
 
@@ -3750,16 +3687,16 @@ $J("<style>").append('\
 	.i-Wall-1, .i-Wall-2, .i-Wall-3, .i-Wall-4, .i-Wall-5, .i-Wall-6, .i-Wall-7, .i-Wall-8, .i-Wall-9 {\
 		background-position:  -450px -272px;\
 	}\
-	.i-EnergyCollector-10 {\
+	.i-EnergyCollector-1, .i-EnergyCollector-2, .i-EnergyCollector-3, .i-EnergyCollector-4, .i-EnergyCollector-5, .i-EnergyCollector-6, .i-EnergyCollector-7, .i-EnergyCollector-8, .i-EnergyCollector-9, .i-EnergyCollector-10 {\
 		background-position:  -475px -119px;\
 	}\
-	.i-Mausoleum-10 {\
+	.i-Mausoleum-1, .i-Mausoleum-2, .i-Mausoleum-3, .i-Mausoleum-4, .i-Mausoleum-5, .i-Mausoleum-6, .i-Mausoleum-7, .i-Mausoleum-8, .i-Mausoleum-9, .i-Mausoleum-10 {\
 		background-position:  -475px -136px;\
 	}\
-	.i-DarkPortal-10 {\
+	.i-DarkPortal-1, .i-DarkPortal-2, .i-DarkPortal-3, .i-DarkPortal-4, .i-DarkPortal-5, .i-DarkPortal-6, .i-DarkPortal-7, .i-DarkPortal-8, .i-DarkPortal-9, .i-DarkPortal-10 {\
 		background-position:  -475px -153px;\
 	}\
-	.i-SpectralDragonKeep-10 {\
+	.i-SpectralDragonKeep-1, .i-SpectralDragonKeep-2, .i-SpectralDragonKeep-3, .i-SpectralDragonKeep-4, .i-SpectralDragonKeep-5, .i-SpectralDragonKeep-6, .i-SpectralDragonKeep-7, .i-SpectralDragonKeep-8, .i-SpectralDragonKeep-9, .i-SpectralDragonKeep-10 {\
 		background-position:  -475px -170px;\
 	}\
 	/****************************************************************************/\
@@ -4577,10 +4514,9 @@ function getFlashvars()
 	S3_SERVER	 = rslt.s3_server;
 	S3_SWF_PREFIX= rslt.s3_swf_prefix;
 	SERVER_ID	 = ( /realm(\d+)\./.exec( API_SERVER ) || ['',''] )[1];
+
+	setTimeout ( scriptStartUp, SCRIPT_STARTUP_DELAY );
 }
-
-getFlashvars();
-
 
 /************************
 **   scriptStartUp
@@ -4630,7 +4566,7 @@ function scriptStartUp()
 					*                   ( We will end up losing everyone )
 					*/
 					,delay_min				: 15
-					,delay_max				: 30
+					,delay_max				: 110
 				},
 				
 				auto_collect	: {
@@ -4684,7 +4620,7 @@ function scriptStartUp()
 					,requests : {
 						 start_at				: 0
 						,counter				: 0
-						,max_per_hour           : 120
+						,max_per_hour           : 80
 					}
 				},
 				
@@ -4745,6 +4681,7 @@ function scriptStartUp()
 								Giant				: 0,
 								FireMirror			: 0,
 								StoneTroop			: 0
+
 							}
 						 }
 						 ,{
@@ -4900,7 +4837,7 @@ function scriptStartUp()
 					,requests : {
 						 start_at				: 0
 						,counter				: 0
-						,max_per_hour           : 150
+						,max_per_hour           : 80
 					}
 				},
 				
@@ -4910,7 +4847,7 @@ function scriptStartUp()
 					,stop_on_loss		: true
 					,delete_reports		: true
 					,delay_min			: 15
-					,delay_max			: 30
+					,delay_max			: 35
 					,units 				: {}
 					,dragons			: {}
 					,target	: {
@@ -5144,14 +5081,14 @@ function scriptStartUp()
 				
 				// Fix progress bar steps & time to initialize the cities
 				StepTimeBar.steps += Seed.city_init.length;
-				StepTimeBar.delay = Seed.city_init.length * 5000;
+				StepTimeBar.delay = Seed.city_init.length * 7000;
 				
 				Seed.fetchCity ({
 					city_id  : city_id,
 					from_init: true,
 					onSuccess : function ( r ) {
 
-						wait_time = Math.randRange(3000,5000);
+						wait_time = Math.randRange(5000,7000);
 						
 						StepTimeBar.update ( current_step );
 			
@@ -5189,13 +5126,13 @@ function scriptStartUp()
 					var city_id = Seed.city_init[i].id;
 					
 					// Fix progress bar total time to initialize the cities
-					StepTimeBar.delay = 3000;
+					StepTimeBar.delay = 5000;
 							
 					Seed.fetchCity ({
 						city_id  : city_id,
 						from_init: true,
 						onSuccess : function ( r ) {
-							wait_time = Math.randRange(3000,5000);
+							wait_time = Math.randRange(5000,7000);
 						
 							if ( current_index == Seed.city_init.length - 1 ){
 								wait_time = 1500;
@@ -5251,7 +5188,7 @@ function scriptStartUp()
 			Messages.init ();
 		
 			// Create a new popup DIV for the main script window
-			var width = Math.randRange(495, 500);
+			var width = Math.randRange(500, 515);
 			if ( Data.options.main_box.x < 1 ) 
 			{
 				Data.options.main_box.x = parseInt( document.body.offsetWidth - ( document.body.offsetWidth - 760 ) / 2 - width / 2) ;
@@ -5575,8 +5512,8 @@ MyAjax = {
 			
 			// headers['Origin'] = S3_SERVER;
 			
+			headers['x-s3-aws'] = SHA1( 'Draoumculiasis' + params + 'LandCrocodile' + options.url  + 'Bevar-Asp' );
 			headers['content-type'] = 'application/x-www-form-urlencoded';
-			headers['X-S3-AWS'] = SHA1( 'Draoumculiasis' + params + 'LandCrocodile' + options.url  + 'Bevar-Asp' );
 		} 
 		
 		// Merge headers with option.headers
@@ -7752,7 +7689,7 @@ Map = {
 			4	: 'Wind',
 			5	: 'Ice',
 			6	: 'Sunken',
-			7	: 'gaea',
+			7	: 'Gaea',
 			8	: 'Desert',
 			10	: 'Spectral',
 			'City'			:0,
@@ -7762,7 +7699,7 @@ Map = {
 			'Wind'			:4,
 			'Ice'			:5,
 			'Sunken'		:6,
-			'gaea'			:7,
+			'Gaea'			:7,
 			'Desert'		:8,
 			'Spectral'		:10,
 		}
@@ -7776,7 +7713,6 @@ Map = {
 		Lake		 :[],
 		Mountain	 :[],
 		Plain		 :[],
-
 		City		 :[],
 		// Outpost		 :[],
 		// Wildernesses :[]
@@ -7884,7 +7820,6 @@ Map = {
 			Lake		 :[],
 			Mountain	 :[],
 			Plain		 :[],
-
 			City		 :[],
 			// Outpost		 :[],
 			// Wildernesses :[]
@@ -8416,6 +8351,8 @@ Marches = {
 	remove : function ( march_id, type )
 	{   
 		var t = Marches;
+		var j = Tabs.Jobs;
+
 		if ( march_id )
 		{
 			if ( Seed.marches[march_id] )
@@ -8434,6 +8371,11 @@ Marches = {
 			
 			if ( type && ( Data.marches[type] )[march_id] )
 			{
+				if ( ( Data.marches[type] )[march_id].res ){
+					Resources.add(( Data.marches[type] )[march_id].res);
+				}
+				j.trainTick();
+
 				try {
 					delete ( ( Data.marches[type] )[march_id] );
 				} catch(e){
@@ -8509,11 +8451,11 @@ Marches = {
 
 
 			if ( march ){
-				if (march.run_at === undefined || now > march.run_at + 1 ) {
+				if (march.run_at === undefined || now > march.run_at) {
 					switch( march.status )
 					{
 					case 'marching':
-						march.run_at = now - 1 + march.duration !== undefined ? march.duration : delay_min;
+						march.run_at = now + (march.duration !== undefined ? march.duration : Data.options.attacks.delay_max);
 						march.status = 'retreating';
 						break;
 					case 'retreating':
@@ -9346,7 +9288,6 @@ Resources = {
 				Seed.cities[ 0 ].resources[ type ] = value;
 			}
 		}
-
 	},
 
 };// END Resourses
@@ -10154,7 +10095,6 @@ Seed = {
 		} 
 
 		t.jobs[ city_id ][ job.id ] = job; //.cloneProps ();
-
 	},
 
 }; // END Seed
@@ -10530,7 +10470,6 @@ Translation = {
 	{
 		//subkey = subkey !== undefined ? subkey : 'name';
 		return Translation.getContent( 'activerecord', key, subkey );
-
 	},
 	
 }; // END Translation
@@ -11168,7 +11107,7 @@ Tabs.Info = {
 		 '			<table class="' + UID['table'] + ' zebra" style="width:100%;">'
 		+'				<tr>'
 		+'					<th style="text-align:right !important;">' 
-		+ 						translate('Name')
+		+ 						translate('Name') 
 		+'						<span style="font-family:Wingdings;">&nbsp;«</span>'
 		+'					</th>'
 		+'					<th>' + translate('Victory') + '</th>'
@@ -11261,7 +11200,7 @@ Tabs.Waves = {
 	$container		: null,
 	$content		: null,
 	
-	units_type		: ['Conscript','Spy','Halberdsman','Minotaur','Longbowman','SwiftStrikeDragon','BattleDragon','ArmoredTransport','Giant','FireMirror','PackDragon','AquaTroop','StoneTroop','FireTroop','WindTroop','IceTroop', 'FrostGiant', 'SwampTroop', 'ForestTroop', 'DesertTroop'],
+	units_type		: ['ArmoredTransport','PackDragon','Conscript','Spy','Halberdsman','Minotaur','Longbowman','SwiftStrikeDragon','BattleDragon','Giant','FireMirror','AquaTroop','StoneTroop','FireTroop','WindTroop','IceTroop', 'FrostGiant', 'SwampTroop', 'ForestTroop', 'DesertTroop'],
 
 	timer			: { 
 		 attack			: null
@@ -11736,11 +11675,11 @@ Tabs.Waves = {
 			*                   ( We will end up losing everyone )
 			*/
 			var min = parseIntZero( event.target.value );
-			if (min < 5 || min > 3600){
-				min = ( min < 5 ) ? 5 : 3600;
+			if (min < 25 || min > 3600){
+				min = ( min < 25 ) ? 25 : 3600;
 				$J(this).val ( min );
 			}
-			var max = parseInt ( min + 5 );
+			var max = parseInt ( min + 15 );
 
 			$J('#'+UID['Tabs.Waves.tabOptions.delayMax']).html( max );
 			
@@ -12348,55 +12287,67 @@ Tabs.Attacks = {
 	gotBattleReport : function ( r )
 	{
 		var t = Tabs.Attacks;
+		var is_target = false;
 		debugLog ('Tabs.Attacks.gotBattleReport'); 
-		// tie report to march id ...
-		var march_id = null;
-		for (var id in Data.marches.attacks )
+		for (var i=0; i < t.targets.length; i++)
 		{
-			var march = Data.marches.attacks[id];
-			
-			if (march.x === r.report.location.x && 
-				march.y === r.report.location.y &&
-				march.general && march.general.id === r.report.attacker.general.id
-				){  // TODO: time and units check here
-					march_id = id;
-					break;
+			if ( t.targets[i].x === r.report.location.x &&
+			     t.targets[i].y === r.report.location.y ) {
+				is_target = true;
+				break;
 			}
 		}
-
-		if (march_id) {
-			t.trackStats (march_id, r);
-		}
-		
-		//fetchPlayer when new item (Didi modif)
-		var items = r.report.spoils.items;
-		if ( items.length !== 0 ) {
-			// Don't fetch Cities, only player.json
-			Seed.fetchPlayer ({
-				noCities  : true,
-				onSuccess : function(){},
-				onFailure : function(){},
-			});
-		}
-		
-		if ( !Data.options.attacks.delete_reports && !Data.options.attacks.stop_on_loss ){
-			return;
-		}
-		//debugLog (inspect (r, 8, 1));
-		if ( Data.options.attacks.stop_on_loss )
+		if ( is_target )
 		{
-			for (var p in r.report.attacker.units)
+			
+			var march_id = null;
+			for (var id in Data.marches.attacks )
 			{
-				if ( r.report.attacker.units[p][0] !== r.report.attacker.units[p][1] )
-				{
-					var ts = new Date(r.report_notification.created_at * 1000).myString();
-					t.abort (translate('Troops lost') +'! ('+ ts +')');
-					return;
+				var march = Data.marches.attacks[id];
+				
+				if (march.x === r.report.location.x && 
+					march.y === r.report.location.y &&
+					march.general && march.general.id === r.report.attacker.general.id
+					){  // TODO: time and units check here
+						march_id = id;
+						break;
 				}
 			}
-		}
-		if (Data.options.attacks.delete_reports && r.report.attacker.name === Seed.player.name){
-			Messages.deleteMessage (r.report_notification.id);
+
+			if (march_id) {
+				t.trackStats (march_id, r);
+			}
+			// Don't fetch Cities, only player.json
+			//fetchPlayer when new item (Didi modif)
+			var items = r.report.spoils.items;
+			if ( items.length !== 0 ) {
+				// Don't fetch Cities, only player.json
+				Seed.fetchPlayer ({
+					noCities  : true,
+					onSuccess : function(){},
+					onFailure : function(){},
+				});
+			}
+			
+			if ( !Data.options.attacks.delete_reports && !Data.options.attacks.stop_on_loss ){
+				return;
+			}
+			//debugLog (inspect (r, 8, 1));
+			if ( Data.options.attacks.stop_on_loss )
+			{
+				for (var p in r.report.attacker.units)
+				{
+					if ( r.report.attacker.units[p][0] !== r.report.attacker.units[p][1] )
+					{
+						var ts = new Date(r.report_notification.created_at * 1000).myString();
+						t.abort (translate('Troops lost') +'! ('+ ts +')');
+						return;
+					}
+				}
+			}
+			if (Data.options.attacks.delete_reports && r.report.attacker.name === Seed.player.name){
+				Messages.deleteMessage (r.report_notification.id);
+			}
 		}
 	},
 
@@ -12682,27 +12633,31 @@ Tabs.Attacks = {
 		// Clone the units to include the dragon available
 		var units = Data.options.attacks.units[target.level].cloneProps(); 
 		
-		// Verify if a dragon is available (by Didi)
+		// Check dragon can be sent om march
 		var dragons_selected = false;
 		var dragon_added = false;
+		// Loop through all possible dragons
 		for ( var dragon_idx = 0; dragon_idx < DRAGONS_NAMES.length; dragon_idx++)
 		{
 			var dragon_type = DRAGONS_NAMES[ dragon_idx ];
 			
 			if ( dragon_type == '' ) continue;
-			
+			// If the dragon type has been selected for this march it will be in the units list.
 			var num =  units[dragon_type];
 			if ( num > 0 ) { 
+				// A dragon has been found in the units list, check that it can be sent.
 				dragons_selected = true;
 				var dragon = Seed.dragons[dragon_type];
-				if ( dragon_added ||
-					 !dragon.is_in_city || 
-					 !dragon.can_attack || 
-					 (dragon.life / dragon.maximum_life   <= 0.75 )
+				if ( !dragon_added &&
+					 dragon.is_in_city && 
+					 dragon.can_attack && 
+					 (dragon.life / dragon.maximum_life > 0.75 )
 					) {
-					units[dragon_type] = 0;
-				} else {
+					// The dragon is in the city and is healthy enough to attack, consider this dragon added to the march.
 					dragon_added = true;
+				} else {
+					// The dragon can not be sent on the march change the units value so this dragon is not sent.
+					units[dragon_type] = 0;
 				}
 			}
 		}
@@ -12832,6 +12787,8 @@ Tabs.Attacks = {
 			// Is this target attackable?
 			if ( target_states && target_states.attackable )
 			{
+
+				// Has the target never been attacked?
 				if ( !target_states.last_attack || target_states.last_attack === 0
                      || target_states.last_attack < now - 2700 ) 
 				{
@@ -13853,7 +13810,7 @@ Tabs.Attacks = {
 			quantity = (isNaN(quantity)) ? 1 : quantity;
 			var name = (item.replace(/\d/g,'')).strip();
 			
-			if ( /(Blink|Hop|Skip|Leap|Bounce|Bore|Bolt|Blast)/.test(name) )  {
+			if ( /(Blink|Hop|Skip|Jump|Leap|Bounce|Bore|Bolt|Blast)/.test(name) )  {
 				objAddTo (Data.stats.items.speedups, name, quantity);
 			} 
 			else if ( /(Respirators|Volcanic|Mandrakes|Banshee|Reaper|Scale|Glacial|Titan|DragonEgg)/.test(name) ) {
@@ -13879,6 +13836,7 @@ Tabs.Attacks = {
 
 		
 		Data.marches.attacks[march_id].has_report = true;
+		Data.marches.attacks[march_id].res = resources;
 		
 		t.showStats();
 	},
@@ -14797,6 +14755,8 @@ Tabs.Jobs = {
 		errors		: 0,
 		error_delay : 60000,
 		current_city: 0,
+        current_troop: 0,
+		inProgress : false,
 	},
 	
 	building	: {
@@ -14819,9 +14779,9 @@ Tabs.Jobs = {
 	},
 	
 
-	research_index	: {Agriculture:0, Woodcraft:1, Masonry:2, Mining:3, Clairvoyance:4, RapidDeployment:5, Ballistics:6, Metallurgy:7, Medicine:8, Dragonry:9, Levitation:10, Mercantilism:11, AerialCombat:12},
+	research_index	: {Agriculture:0, Woodcraft:1, Masonry:2, Mining:3, Clairvoyance:4, RapidDeployment:5, Ballistics:6, Metallurgy:7, Medicine:8, Dragonry:9, Levitation:10, Mercantilism:11, AerialCombat:12, EnergyCollection:13,  WarriorRevival:14, GuardianRevival:15},
 	
-	research_type	: ['Agriculture', 'Woodcraft', 'Masonry', 'Mining', 'Clairvoyance', 'RapidDeployment', 'Ballistics', 'Metallurgy', 'Medicine', 'Dragonry', 'Levitation', 'Mercantilism', 'AerialCombat'],
+	research_type	: ['Agriculture', 'Woodcraft', 'Masonry', 'Mining', 'Clairvoyance', 'RapidDeployment', 'Ballistics', 'Metallurgy', 'Medicine', 'Dragonry', 'Levitation', 'Mercantilism', 'AerialCombat', 'EnergyCollection','WarriorRevival','GuardianRevival'],
 	
 	building_capital: ['Home', 'Garrison', 'ScienceCenter', 'Metalsmith', 'OfficerQuarter', 'MusterPoint', 'Rookery', 'StorageVault', 'Theater', 'Sentinel', 'Factory', 'Fortress', 'DragonKeep', 'Wall'],
 	
@@ -14839,12 +14799,13 @@ Tabs.Jobs = {
 		var t = Tabs.Jobs;
 		
 		// Variables Initializations
+		/*
 		if ( Seed.cities[10] )
 		{
 			t.research_index += {EnergyCollection:13,  WarriorRevival:14, GuardianRevival:15};
 			t.research_type = t.research_type.concat(['EnergyCollection','WarriorRevival','GuardianRevival']);
 		}
-		
+		*/
 		
 		// Tab initialization
 		t.container = div;
@@ -16057,7 +16018,8 @@ Tabs.Jobs = {
 		if ( on_off )
 		{
 			t.dispFeedback(translate('Starting soon') + '...' + translate('Please wait') + '...');
-			t.training.timer.tick= setTimeout( t.trainTick, 3000, 0 );
+			t.training.timer.tick= setTimeout( t.trainTick, 1000, 0 );
+			t.training.inProgress = false;
 		} 
 		else {
 			// Erase previous feedback
@@ -16794,7 +16756,8 @@ Tabs.Jobs = {
 		var t = Tabs.Jobs;
 		
 		++t.training.current_city;
-		
+		t.training.current_troop = 0;
+
 		var city_idx = t.training.current_city;
 		
 		if ( !Seed.cities[ city_idx ] || 
@@ -16816,9 +16779,16 @@ Tabs.Jobs = {
 		var t = Tabs.Jobs;
 		var delay = 30000;
 
+		if ( t.training.inProgress == true )
+		{
+			return;
+		}
+		t.training.inProgress = true; 
+
 		clearTimeout ( t.training.timer.tick );
 		
 		if ( !Data.options.training.enabled ){
+			t.training.inProgress = false;
 			return;
 		}
 		
@@ -16834,15 +16804,17 @@ Tabs.Jobs = {
 		
 		var jobs =  getJobs( 'units' , city_idx );
 		
-		if ( jobs.length === 0 || ( by_queue && total_jobs < queue_length ) )
+		if ( t.training.current_troop !== 0 || jobs.length === 0 || ( by_queue && total_jobs < queue_length ) )
 		{
 			var job_list = Data.options.training.city[ city_idx ].units;
 			
 			var units_type = getKeys ( job_list );
 			var len = units_type.length;
-			for ( i=0; i < len; i++) 
+			while ( t.training.current_troop < len ) 
 			{
-				var unit_type = units_type[ i ];
+				var unit_type = units_type[ t.training.current_troop ];
+				t.training.current_troop++;
+
 				var unit_quantity = job_list[ unit_type ];
 				
 				if ( unit_quantity < 1) {
@@ -16852,13 +16824,11 @@ Tabs.Jobs = {
 				var reqs = t.checkTrainReqs( unit_type, unit_quantity, city_idx );
 
 				if ( !reqs.msg ) {
-				
 					if ( Seed.total.training[ Seed.cities[ city_idx ].id ] >= queue_length ) {
 						break;
 					}
 				
 					t.doTrain( unit_type, unit_quantity, city_idx );
-					
 					Seed.total.training[ Seed.cities[ city_idx ].id ]++;
 					
 					if ( by_queue )
@@ -16866,48 +16836,35 @@ Tabs.Jobs = {
 						// move to the end
 						delete ( job_list[ unit_type ] );
 						job_list[ unit_type ] = unit_quantity;
-						
-						delay = Math.randRange( 5000, 7500 );
-						
-						t.training.timer.tick = setTimeout ( t.trainTick, delay);
-						
-						return;
 					}
-				}
-				else {
-					if ( reqs.queue ) {
-					
-						city_idx = t.setNextTrainCity();
-						
-						verboseLog('trainTick next_city' + ( city_idx ) );
-						
-						delay = Math.randRange( 5000, 10000 );
-
-						t.training.timer.tick = setTimeout ( t.trainTick, delay );
-						
-						if ( t.current_tab === 1 ) {
-							t.dispFeedback ( translate( Seed.cities[ city_idx ].type || Seed.cities[ city_idx ].outpost_type) + ' ' + translate('Starting Soon') + '... ' + timeFormat( delay/1000 )  );
-						}
-						
-						return;
-					}
+					delay = Math.randRange( 7500, 15000 );
+					t.training.timer.tick = setTimeout ( t.trainTick, delay);
+					if ( t.current_tab === 1 ) {
+						t.dispFeedback ( translate( Seed.cities[ city_idx ].type || Seed.cities[ city_idx ].outpost_type) + ' ' + translate('Starting Soon') + '... ' + timeFormat( delay/1000 )  );}
+					t.training.inProgress = false;
+					return;
 				}
 			}
 		}
-		
-		
 		city_idx = t.setNextTrainCity();
-			
-		delay = Math.randRange( 5000, 10000 );
-		
-		if ( t.current_tab === 1 ) {
-			t.dispFeedback ( translate( Seed.cities[ city_idx ].type || Seed.cities[ city_idx ].outpost_type) + ' ' + translate('Starting Soon') + '... ' + timeFormat( delay/1000 )  );
+		if ( city_idx ){
+			delay = 10;
+			if ( t.current_tab === 1 ) {
+				t.dispFeedback ( translate( Seed.cities[ city_idx ].type || Seed.cities[ city_idx ].outpost_type) + ' ' + translate('Starting Soon') + '... ' + timeFormat( delay/1000 )  );}
+		} else if ( !Data.options.attacks.enabled ) {
+			delay = 30000;
+			if ( t.current_tab === 1 ) {
+				t.dispFeedback ( translate( Seed.cities[ city_idx ].type || Seed.cities[ city_idx ].outpost_type) + ' ' + translate('Starting Soon') + '... ' + timeFormat( delay/1000 )  );}
+		} else {
+			delay = 60000;
+			if ( t.current_tab === 1 ) {
+				t.dispFeedback ( translate( Seed.cities[ city_idx ].type || Seed.cities[ city_idx ].outpost_type) + ' ' + translate('Starting Soon') + '... March returning' );}
 		}
 		
 		verboseLog('trainTick City' + ( city_idx ) );
+		t.training.inProgress = false;
+		t.training.timer.tick = setTimeout ( t.trainTick, delay);
 
-		t.training.timer.tick = setTimeout ( t.trainTick, delay );
-		
 	},
 
 	// Queue the training job
@@ -16941,7 +16898,7 @@ Tabs.Jobs = {
 				// cloned in order to not modify the original
 				try {
 					var resources = Seed.requirements.unit[ r.job.unit_type ].resources.cloneProps();
-					// values ??calculated based on the number of troops
+					// values ​​calculated based on the number of troops
 					for ( var type in resources ) {
 						if ( resources.hasOwnProperty( type ) ) {
 							resources[type] *= r.job.quantity;
@@ -17426,7 +17383,7 @@ Tabs.Options = {
 		+'<a href="http://wackoscripts.com/index.php?app=ccs" target="_blank">Script Instructions</a><br>'
 		+'<a href="http://wackoscripts.com/index.php?/forum/3-report-problems/" target="_blank">Report Problems</a><br>'
 		+'<a href="http://wackoscripts.com/index.php?/forum/16-features-suggestions/" target="_blank">Features & Suggestions</a><br>'
-		+'<a href="http://wackoscripts.com/index.php?/forum/24-general-discussion/" target="_blank">General Discussion</a><br>'			
+		+'<a href="http://wackoscripts.com/index.php?/forum/24-general-discussion/" target="_blank">General Discussion</a><br>'
 		+'<br><br><b>  If you would like to help with the development of the script or would like to donate<br>  to keep it going you will find a donate on the right side of the forum index!<br><br>'
 		+'Thanks For Your Support!!<br></b>'
 		+'</center>'
@@ -17596,9 +17553,10 @@ Tabs.Options = {
 				}
 				json_data += '}';
 				downloadDataURI({
-        			filename: "realm"+SERVER_ID+"_"+d.toISOString()+".txt", 
+        			filename: "doa_"+Seed.player.name+"_"+serverTime()+".txt", 
         			data: "data:application/text;base64,"+Base64.encode( json_data )
 				});
+				//window.open('data:application/text;base64,' + Base64.encode( json_data ),'Backup','width=300,height=200,toolbar=0,resizable=0');
 			}, 1000);
 		}
 		
@@ -17612,9 +17570,9 @@ Tabs.Options = {
 			setTimeout ( function () {
 				var json_data = '{"map":'+ JSON.stringify( Data.map ) + '}';
 				downloadDataURI({
-        			filename: "map_realm"+SERVER_ID+"_"+d.toISOString()+".txt", 
-        			data: "data:application/text;base64,"+Base64.encode( json_data )
-				});
+				filename: "map_realm"+SERVER_ID+"_"+serverTime()+".txt",
+				data: "data:application/text;base64,"+Base64.encode( json_data )
+			});
 			}, 1000);
 		}
 		
@@ -18735,7 +18693,8 @@ $startUpBox = dialogBox({
 
 StepTimeBar.start({ target:$J('#'+UID['startup-progressbar']), steps:4, delay:SCRIPT_STARTUP_DELAY*3 });
 
-setTimeout ( scriptStartUp, SCRIPT_STARTUP_DELAY );
+setTimeout ( getFlashvars, 45000 );
+
 
 DATA_MAP = 'AAEmSnJ0FWNUEouBelp5cUNRdSJRMYVYFxMkV0RCN2eIOnqGanZqMTcZiYNzNihTKjYXOigXRkqD\
 IokzUYI2ghQjGCNmJ0RBOUJWWhhlWDVTKClhdnVUFVQ3JXFSdVlWGFVpZ1godzVXiTY3gVcqWUkx\
