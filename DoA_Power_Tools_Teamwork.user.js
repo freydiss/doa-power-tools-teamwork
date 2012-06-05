@@ -10668,8 +10668,6 @@ function getMarchTime (x, y, units) {
 	var units_names = getKeys( units );
 	var speed_multiplier = 1;
 
-	speed_multiplier += (( Seed.player.research['Dragonry'] ? parseInt( Seed.player.research['Dragonry'] ) : 0 ) *0.05);
-	speed_multiplier += (( Seed.player.research['RapidDeployment'] ? parseInt( Seed.player.research['RapidDeployment'] ) : 0 ) *0.05);
 	for ( var i = 0; i < units_names.length; i++ )
 	{
 		var name = units_names[i];
@@ -10683,6 +10681,10 @@ function getMarchTime (x, y, units) {
 			}
 		}
 	}
+	if (speed === 99999){ return -1; }
+
+	speed_multiplier += (( Seed.player.research['Dragonry'] ? parseInt( Seed.player.research['Dragonry'] ) : 0 ) *0.05);
+	speed_multiplier += (( Seed.player.research['RapidDeployment'] ? parseInt( Seed.player.research['RapidDeployment'] ) : 0 ) *0.05);
 	var time = dist / ((speed_multiplier * speed) /6000) + 30;
 	return time;
 }
@@ -10888,7 +10890,7 @@ Tabs.Info = {
 			Seed.fetchPlayer ({
 				cities    : [Seed.cities[0].id],
 				callback  : function() {
-					Tabs.Info.showStuff();
+					Tabs.Info.tabSummary();
 				},
 				delay     : 250,
 				caller    : 'Tabs.Info.refresh'
@@ -10929,11 +10931,19 @@ Tabs.Info = {
 						html ( ( Seed.player.alliance ) ? Seed.player.alliance.name : '' )
 					).
 					append( $J('<td />').
-						css({ 
-							textAlign : 'center',
-							width	  : '50%'
+						css({
+							textAlign   : 'left',
+							paddingLeft : '5px',
+							color : 'yellow'
 						}).
-						html('<font color=yellow>' + city.name + '</font>')
+						html ( (Seed.player.might).intToCommas() )
+					).
+					append( $J('<td />').
+						css({ 
+							textAlign   : 'left',
+							paddingLeft	: '5px'
+						}).
+						html(city.name)
 					).
 					append( $J('<td />').
 						css({ 
@@ -11556,7 +11566,7 @@ Tabs.Waves = {
 		 
 		html +=
 		 '<div class=' + UID['content'] + ' style="margin-top:10px !important">'
-		+'	<div id=' + setUID('Tabs.Waves.tabStats.content') + '  style="height:100px; max-height:100px; overflow-y:auto"></div>'
+		+'	<div id=' + setUID('Tabs.Waves.tabStats.content') + '  style="height:380px; max-height:380px; overflow-y:auto"></div>'
 		+'	<hr class=thin>'
 		+'	<div id=' + setUID('Tabs.Waves.tabStats.spoils') + '> &nbsp; </div>'
 		+'	<center>'
@@ -13540,6 +13550,8 @@ Tabs.Attacks = {
 		for (var i=0; i < t.targets.length; i++)
 		{
 			var type = t.targets[i].city_type ? Map.names.cities[ t.targets[i].city_type ] : Map.names.type[ t.targets[i].type ];
+			if ( false == dist_base && -1 == getMarchTime(t.targets[i].x, t.targets[i].y, Data.options.attacks.units[ t.targets[i].level] ) ){ continue; }
+			
 		
 			html +=	'<tr ' + (t.targets[i].attackable ? '' : 'class=' + UID['no-attackable'] + ' ');
 			
@@ -14690,6 +14702,7 @@ Tabs.Attacks = {
 			} else {
 				Tabs.Attacks.targets_sort_by = translate('Distance').substring(0,4);
 			}
+			Tabs.Attacks.targets.sort(Tabs.Attacks.targetsSort);
 		});
 		$J('#'+UID['Tabs.Attacks.tabOptions.log_attacks']).change(function ( event ) {
 			Data.options.attacks.log_attacks = event.target.checked;
