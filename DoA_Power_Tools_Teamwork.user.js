@@ -1,4 +1,4 @@
-﻿﻿﻿
+﻿﻿
 // ==UserScript==
 // @name          DoA Power Tools Teamwork
 // @namespace     http://userscripts.org/scripts/show/124689
@@ -8334,15 +8334,17 @@ Marches = {
 		var t = Marches;
 
 		var march = Seed.marches[march_id];
-		if ( march === null )
-		{
+		if ( march === null ) {
 			if ( DEBUG_MARCHES ) {
 				debugLog ('***** ERRROR March missing from seed: ' + march_id);
 			}
-		} 
-		else {
+		} else {
 			
-			( Data.marches[type] )[march_id] = march.cloneProps();
+			if ( (Data.marches[type])[march_id] === undefined ) {
+				( Data.marches[type] )[march_id] = march.cloneProps();
+			} else {
+				( Data.marches[type] )[march_id].mergeWith( march );
+			}
 			
 			if ( DEBUG_MARCHES ) {
 				debugLog ('Marches.add: ID=' + march.id + '  (' + march.x + ',' + march.y + ')');
@@ -8458,6 +8460,7 @@ Marches = {
 					{
 					case 'marching':
 						march.run_at = now + (march.duration !== undefined ? march.duration : Data.options.attacks.delay_max);
+// it would be better to use getMarchTime(march.x, march.y, Data.options.attacks.units[march.level]) but can we rely on any march data if the duration is broken?.
 						march.status = 'retreating';
 						break;
 					case 'retreating':
@@ -9932,7 +9935,11 @@ Seed = {
 			{
 				var march = city.marches[i];
 				
-				t.marches[ march.id ] = march.cloneProps();
+				if ( t.marches[ march.id ] === undefined ) {
+					t.marches[ march.id ] = march.cloneProps();
+				} else {
+					t.marches[ march.id ].mergeWith( march );
+				}
 				
 				if ( march.general_id ){
 
@@ -11220,7 +11227,8 @@ Tabs.Waves = {
 
 	timer			: { 
 		 attack			: null
-		,marches		: null 
+		,marches		: null
+		,tick   		: null
 	},
 
 	running			: {
@@ -11294,7 +11302,7 @@ Tabs.Waves = {
 	hide : function ()
 	{
 		var t = Tabs.Waves;
-		//clearTimeout ( t.timer.tick );
+		clearTimeout ( t.timer.tick );
 	},
 	
 	onUnload : function ()
@@ -11311,6 +11319,8 @@ Tabs.Waves = {
 		
 		var current_tab = event.data.current_tab;
 		
+		clearTimeout ( t.timer.tick );
+
 		Data.options.waves.current_tab = current_tab;
 
 		var tab_name;
@@ -11631,7 +11641,7 @@ Tabs.Waves = {
 		// Event Listeners
 		$J('#'+UID['Tabs.Waves.tabStats.clearStats']).click ( clearStats );
 		
-		showStats();
+		t.timer.tick = setInterval( showStats, 1000 );
 	},
 		
 	tabOptions : function ()
@@ -14698,7 +14708,7 @@ Tabs.Attacks = {
 		$J('#'+UID['Tabs.Attacks.tabOptions.order_by_time']).change(function ( event ) {
 			Data.options.attacks.order_by_time = event.target.checked;
 			if ( Data.options.attacks.order_by_time ) {
-				Tabs.Attacks.targets_sort_by = translate('March time').split(' ').join('').trim();
+				Tabs.Attacks.targets_sort_by = translate('March time').strip();
 			} else {
 				Tabs.Attacks.targets_sort_by = translate('Distance').substring(0,4);
 			}
