@@ -3017,20 +3017,23 @@ $J("<style>").append('\
 	.i-Skip {\
 		background-position:  -52px -17px;\
 	}\
-	.i-Leap {\
+	.i-Jump {\
 		background-position:  -78px -17px;\
 	}\
-	.i-Bounce {\
-		background-position: -104px -17px;\
+	.i-Leap {\
+		background-position:  -104px -17px;\
 	}\
-	.i-Bore {\
+	.i-Bounce {\
 		background-position: -130px -17px;\
 	}\
-	.i-Bolt {\
+	.i-Bore {\
 		background-position: -156px -17px;\
 	}\
-	.i-Blast {\
+	.i-Bolt {\
 		background-position: -182px -17px;\
+	}\
+	.i-Blast {\
+		background-position: -209px -17px;\
 	}\
 	.i-ForcedMarchDrops {\
 		background-position: -209px -34px;\
@@ -3290,25 +3293,73 @@ $J("<style>").append('\
 	.i-AquaTroopRespirator {\
 		background-position:    0px -424px;\
 	}\
+	.i-AquaTroopRespiratorStack100 {\
+		background-position:    0px -424px;\
+	}\
+	.i-AquaTroopRespiratorStack500 {\
+		background-position:    0px -424px;\
+	}\
 	.i-StoneTroopItem {\
+		background-position:  -26px -424px;\
+	}\
+	.i-StoneTroopItemStack100 {\
+		background-position:  -26px -424px;\
+	}\
+	.i-StoneTroopItemStack500 {\
 		background-position:  -26px -424px;\
 	}\
 	.i-FireTroopItem {\
 		background-position:  -52px -424px;\
 	}\
+	.i-FireTroopItemStack100 {\
+		background-position:  -52px -424px;\
+	}\
+	.i-FireTroopItemStack500 {\
+		background-position:  -52px -424px;\
+	}\
 	.i-FrostGiantItem {\
+		background-position:  -176px -424px;\
+	}\
+	.i-FrostGiantItemStack100 {\
+		background-position:  -176px -424px;\
+	}\
+	.i-FrostGiantItemStack500 {\
 		background-position:  -176px -424px;\
 	}\
 	.i-WindTroopItem {\
 		background-position:  -78px -424px;\
 	}\
+	.i-WindTroopItemStack100 {\
+		background-position:  -78px -424px;\
+	}\
+	.i-WindTroopItemStack500 {\
+		background-position:  -78px -424px;\
+	}\
 	.i-IceTroopItem {\
+		background-position: -130px -424px;\
+	}\
+	.i-IceTroopItemStack100 {\
+		background-position: -130px -424px;\
+	}\
+	.i-IceTroopItemStack500 {\
 		background-position: -130px -424px;\
 	}\
 	.i-SwampTroopItem {\
 		background-position: -155px -424px;\
 	}\
+	.i-SwampTroopItemStack100 {\
+		background-position: -155px -424px;\
+	}\
+	.i-SwampTroopItemStack500 {\
+		background-position: -155px -424px;\
+	}\
 	.i-ForestTroopItem {\
+		background-position: -201px -424px;\
+	}\
+	.i-ForestTroopItemStack100 {\
+		background-position: -201px -424px;\
+	}\
+	.i-ForestTroopItemStack500 {\
 		background-position: -201px -424px;\
 	}\
 	.i-AnthropusTalisman {\
@@ -3355,6 +3406,9 @@ $J("<style>").append('\
 		background-position:    -573px -186px;\
 	}\
 	.i-Momentary {\
+		background-position:    0px -306px;\
+	}\
+	.i-MomentaryTruce {\
 		background-position:    0px -306px;\
 	}\
 	.i-ArmisticeAgreement {\
@@ -3411,7 +3465,10 @@ $J("<style>").append('\
 	.i-RacechangeItem {\
 		background-position:  -78px -358px;\
 	}\
-	.i-Ticket {\
+	.i-Fortunas {\
+		background-position:    0px -375px;\
+	}\
+	.i-FortunasTicket {\
 		background-position:    0px -375px;\
 	}\
 	.i-FortunasGoldenTicket {\
@@ -4924,6 +4981,8 @@ function scriptStartUp()
 					,chest     : {}
 					,arsenal   : {}
 					,armors    : {}
+					,others	   : {}
+					,trooops   : {}
 				}
 				,waves	: {
 					 start_at		: 0
@@ -11614,7 +11673,7 @@ Tabs.Waves = {
 				var per_hour = num / (run_time/3600);
 				html +=
 				  '<tr>'
-				+ '		<td>' + translate(item) + ':</td>'
+				+ '		<td><span class="' + UID['doa-icons'] + ' i-' + item + '"></span>' + translate(item) + ':</td>'
 				+ '		<td>' + num + ' (' + per_hour.toFixed(2) + '&nbsp;' + translate('per hour') + ')</td>'
 				+ '</tr>';
 			}
@@ -11641,7 +11700,10 @@ Tabs.Waves = {
 		// Event Listeners
 		$J('#'+UID['Tabs.Waves.tabStats.clearStats']).click ( clearStats );
 		
-		t.timer.tick = setInterval( showStats, 1000 );
+		showStats();
+		if ( Data.options.waves.enabled ) {
+			t.timer.tick = setInterval( showStats, 1000 );
+		}
 	},
 		
 	tabOptions : function ()
@@ -11720,55 +11782,49 @@ Tabs.Waves = {
 		var t = Tabs.Waves;
 		
 		if (r.report.location.x === Data.options.waves.target.x && 
-			r.report.location.y === Data.options.waves.target.y
-			){
-				++Data.stats.waves.total;
+			r.report.location.y === Data.options.waves.target.y) {
+
+			++Data.stats.waves.total;
+			
+			var march_id = null;
+			for (var id in Data.marches.waves ) {
+				var march = Data.marches.waves[id];
 				
-				var march_id = null;
-				for (var id in Data.marches.waves )
-				{
-					var march = Data.marches.waves[id];
-					
-					if (march.x === r.report.location.x && 
-						march.y === r.report.location.y &&
-						march.general && march.general.id === r.report.attacker.general.id
-						){  // TODO: time and units check here
-							march_id = id;
-							break;
-					}
+				if (march.x === r.report.location.x && 
+					march.y === r.report.location.y &&
+					march.general && march.general.id === r.report.attacker.general.id
+					){  // TODO: time and units check here
+						march_id = id;
+						break;
 				}
+			}
 				
-				if (march_id) {
-					Data.marches.waves[march_id].has_report = true;
-				}
+			if (march_id) {
+				Data.marches.waves[march_id].has_report = true;
+			}
 				
-				for (var i=0; i < r.report.spoils.items.length; i++){
-					if ( !Data.stats.waves.spoils[r.report.spoils.items[i]] )
-					{
-						Data.stats.waves.spoils[r.report.spoils.items[i]] = 1;
-					}
-					else {
+			for (var i=0; i < r.report.spoils.items.length; i++){
+				if ( !Data.stats.waves.spoils[r.report.spoils.items[i]] ) {
+					Data.stats.waves.spoils[r.report.spoils.items[i]] = 1;
+				} else {
 						++Data.stats.waves.spoils[r.report.spoils.items[i]];
-					}
 				}
+			}
 				
-				if (Data.options.waves.stop_on_loss)
-				{
-					for (var p in r.report.attacker.units)
-					{
-						if (r.report.attacker.units[p][0] !== r.report.attacker.units[p][1])
-						{
-							var ts = new Date(r.report_notification.created_at * 1000).myString();
-							t.setWaveEnable (false);
-							t.dispFeedback (translate('Troops lost') + '! (' + ts +')');
-							actionLog (translate('Wave')+': '+translate('Troops lost')+'! ('+ ts +')');
-							return;
-						}
+			if (Data.options.waves.stop_on_loss) {
+				for (var p in r.report.attacker.units) {
+					if (r.report.attacker.units[p][0] !== r.report.attacker.units[p][1]) {
+						var ts = new Date(r.report_notification.created_at * 1000).myString();
+						t.setWaveEnable (false);
+						t.dispFeedback (translate('Troops lost') + '! (' + ts +')');
+						actionLog (translate('Wave')+': '+translate('Troops lost')+'! ('+ ts +')');
+						return;
 					}
 				}
-				if (Data.options.waves.delete_reports && r.report.attacker.name === Seed.player.name){
-					Messages.deleteMessage(r.report_notification.id);
-				}
+			}
+			if (Data.options.waves.delete_reports && r.report.attacker.name === Seed.player.name){
+				Messages.deleteMessage(r.report_notification.id);
+			}
 		}
 	},
 
@@ -11808,6 +11864,7 @@ Tabs.Waves = {
 		else {
 			but.value = translate('Disabled').toUpperCase();
 			but.className = UID['btn_off'];
+			clearTimeout ( t.timer.tick );
 			
 			if ( t.running.start_at !== 0 ){
 				Data.stats.waves.run_time += ( serverTime() - t.running.start_at );
@@ -13855,6 +13912,8 @@ Tabs.Attacks = {
 			,chest     : {}
 			,arsenal   : {}
 			,armors    : {}
+			,others	   : {}
+			,trooops   : {}
 		}
 		
 		t.running.start_at = now;
@@ -13902,7 +13961,7 @@ Tabs.Attacks = {
 			var item = translate( items_res[i] );
 			var quantity = parseInt( item );
 			quantity = (isNaN(quantity)) ? 1 : quantity;
-			var name = (item.replace(/\d/g,'')).strip();
+			var name = (item.replace(/\d|\'/g,'')).strip();
 			
 			if ( /(Blink|Hop|Skip|Jump|Leap|Bounce|Bore|Bolt|Blast)/.test(name) )  {
 				objAddTo (Data.stats.items.speedups, name, quantity);
