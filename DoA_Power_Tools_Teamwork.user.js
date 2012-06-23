@@ -26,17 +26,17 @@
 // @exclude       *://accounts.google.com/*
 // @exclude       *://talkgadget.google.com/*
 // @exclude       *://www.googleapis.com/static*
-// @version       2012.06.02a
+// @version       2012.06.22a
 // @icon          http://www.wackoscripts.com/icon.png
-// @changelog     <ul><li><b>Fixed</b> Added the Spectral Outpost Research items (will always show now)</li></ul>
+// @changelog     <ul><li><b>Added</b> New troop "Dark Slayer" to show in info/waves/attacks </li><li><b>Added</b> New troops "Dark Slayer" to be trained (This may change not sure when it can be trained)</li><li><b>Added</b> New troops "Dark Slayer" Icons</li><li><b>Changed</b> API version so script will work :)</li></ul>
 // ==/UserScript==
 
 /********************************************************************************
  * INFORMATION                                                                  *
  *                                                                              *
  * Name: DoA Power Tools Teamwork                                               *
- * Version: 2012.06.02a			                                        	    *
- * Last Modified: 2nd June 2012 15:00  GMT+3                            	    *
+ * Version: 2012.06.22a			                                        	    *
+ * Last Modified: 22nd June 2012 8:00  GMT+3                            	    *
  * Original Authors: G.Jetson, Runey & Wham                                     *
  * Current  Authors: La Larva, Les, Runey, Lord Mimir, Wham, Didi & Jawz        *
  * Collaborators:                                                               *
@@ -152,13 +152,13 @@ var $J;
 var SCRIPT_NAME		= 'DoA Power Tools Teamwork';
 
 // Script Version: Year, Month, Day, Revision, Maturity (e.g. YYYY.MMDDa_BETA)
-var SCRIPT_VERSION	= '2012.06.02a';
+var SCRIPT_VERSION	= '2012.06.22a';
 
 // For Script Mod Authors  ex: (AuthorName Mod)
 var SCRIPT_MOD_BY	= '';
 
 // DoA API Version
-var API_VERSION		= 'spinal';
+var API_VERSION		= 'coofour';
 
 // Generates an ID from the name of the script to be used when data is stored in 
 // localStorage to prevent overlap of data between different scripts
@@ -635,6 +635,7 @@ case 'de':
 	'~WaterDragon':'WasserDr',          /* idem */
 	'~WindDragon':'WindDr',             /* idem */
 	'~WindTroop':'Banshee',             /* idem */
+	'~DarkSlayer':'Dark',             /* idem */
 	'~Zzz':'Zzz'
 	};
 	break;
@@ -1661,6 +1662,7 @@ case 'tt':
 	'~WaterDragon':'WatDrg',	/* idem */ 
 	'~WindDragon':'WndDrg',		/* idem */ 
 	'~WindTroop':'Banshee',		/* idem */ 
+	'~DarkSlayer':'DarkSl',     /* idem */
 	'~Zzz':'Zzz' 
 	};
 	break;
@@ -1816,7 +1818,8 @@ default:
 	'~BattleDragon':'BatDrg',		/* idem as above */
 	'~Conscript':'Conscr',			/* idem above */
 	'desert_dragon outpost':'Desert Settlers',
-	'~DesertDragon':'HelioDrg',			/* idem */
+	'~DesertDragon':'HelioDrg',		/* idem */
+	'~DarkSlayer':'DarkSlay',
 	'~FireDragon':'FireDrg',		/* idem */
 	'~FireMirror':'FireMir',		/* idem */
 	'~FireTroop':'LavaJaws',		/* idem */
@@ -1841,6 +1844,7 @@ default:
 	'~WindDragon':'WndDrg',			/* idem */
 	'~WindTroop':'Banshee',			/* idem */
 	'~IceTroop':'Reaper',			/* idem */
+	'~DesertTroop':'SandStri',			/* idem */
 	'~Zzz':'Zzz'
 	};
 }
@@ -3362,6 +3366,15 @@ $J("<style>").append('\
 	.i-ForestTroopItemStack500 {\
 		background-position: -201px -424px;\
 	}\
+	.i-DarkSlayerItem {\
+		background-position: -224px -424px;\
+	}\
+	.i-DarkSlayerItemStack100 {\
+		background-position: -224px -424px;\
+	}\
+	.i-DarkSlayerItemStack500 {\
+		background-position: -224px -424px;\
+	}\
 	.i-AnthropusTalisman {\
 		background-position: -260px    0px;\
 	}\
@@ -3576,6 +3589,9 @@ $J("<style>").append('\
 	}\
 	.i-ForestTroop {\
 		background-position: -488px -466px;\
+	}\
+	.i-DarkSlayer {\
+		background-position: -535px -466px;\
 	}\
 	/****    Maps    ****/\
 	.i-AnthropusCamp {\
@@ -4707,7 +4723,8 @@ function scriptStartUp()
 								BattleDragon		: 0,
 								ArmoredTransport	: 0,
 								Giant				: 0,
-								FireMirror			: 0
+								FireMirror			: 0,
+								DarkSlayer			: 0
 							}
 						 }
 						,{
@@ -4882,6 +4899,7 @@ function scriptStartUp()
 						ArmoredTransport	: 0,
 						Giant				: 0,
 						FireMirror			: 0,
+						DarkSlayer			: 0,
 						AquaTroop			: 0,
 						StoneTroop			: 0,
 						FireTroop			: 0,
@@ -10305,36 +10323,17 @@ Translation = {
 	parseXML : function( xml_string )
 	{
 		var t = Translation;
-		var fragment = [];
-	
-		fragment.push( '<?xml version="1.0" encoding="UTF-8"?>' );
-		fragment.push( '<translations>' );
-		
-		// sections to remove
-		var remove_sections = ['dragons','errors'];
-		for ( var i=0; i < remove_sections.length; i++ )
-		{
-			var start = xml_string.indexOf('<'+remove_sections[i]+'>');
-			var end = xml_string.indexOf('</'+remove_sections[i]+'>') + remove_sections[i].length + 3;
-			xml_string = xml_string.substring(1, start) + xml_string.substring(end);
-		}
-		
-		// sections to add
-		for ( i = 0; i < t._section.length; i++ )
-		{
-			var start = xml_string.indexOf( '<' + t._section[i] + '>' );
-			var end = xml_string.indexOf( '</' + t._section[i] + '>') + t._section[i].length + 3;
-			fragment.push( xml_string.substring( start, end ) );
-			xml_string = xml_string.substring( 1, start ) + xml_string.substring( end) ;
-		}
-		
-		fragment.push( '</translations>' );
-
 		var xml_obj = new XML.ObjTree();
-		t.data = xml_obj.parseXML( fragment.join('').replace(/\n/g,'') );
+		t.data = xml_obj.parseXML( xml_string.replace(/\n/g,'') );
 
 		if ( t.data.translations ) {
 			t.data = t.data.translations;
+			// sections to remove
+			var remove_sections = ['dragons','errors','login-messages','targeted-messages','tournaments','around-game-alerts','activerecord'];
+			for ( var i=0; i < remove_sections.length; i++ )
+			{
+				delete( t.data[remove_sections[i]] );
+			}
 		} else {
 			verboseLog('<b>ERROR</b> in the XML file structure: <b><translations></b> element not found!');
 		}
@@ -10766,11 +10765,11 @@ Tabs.Info = {
 	show_flash  : true,
 	show_fulscreen  : false,
 	
-	units_type	: ['Porter','Conscript','Spy','Halberdsman','Minotaur','Longbowman','SwiftStrikeDragon','BattleDragon','ArmoredTransport','Giant','FireMirror','PackDragon','AquaTroop','StoneTroop','FireTroop','WindTroop','IceTroop', 'FrostGiant', 'SwampTroop', 'ForestTroop', 'DesertTroop'],
+	units_type	: ['Porter','Conscript','Spy','Halberdsman','Minotaur','Longbowman','SwiftStrikeDragon','BattleDragon','ArmoredTransport','Giant','FireMirror','PackDragon','DarkSlayer','AquaTroop','StoneTroop','FireTroop','WindTroop','IceTroop', 'FrostGiant', 'SwampTroop', 'ForestTroop', 'DesertTroop'],
 	
 	resources_type  : [ 'gold', 'food', 'wood', 'ore', 'stone','blue_energy' ],
 	
-	items_arsenal   : [ 'AquaTroopRespirator', 'StoneTroopItem', 'FireTroopItem', 'WindTroopItem', 'IceTroopItem', 'SwampTroopItem', 'FrostGiantItem', 'ForestTroopItem', 'AnthropusTalisman' ],
+	items_arsenal   : [ 'AquaTroopRespirator', 'StoneTroopItem', 'FireTroopItem', 'WindTroopItem', 'IceTroopItem', 'SwampTroopItem', 'FrostGiantItem', 'ForestTroopItem', 'DarkSlayerItem', 'AnthropusTalisman' ],
 
 	init : function ( div )
 	{
@@ -10957,6 +10956,7 @@ Tabs.Info = {
 				cities    : [Seed.cities[0].id],
 				callback  : function() {
 					Tabs.Info.tabSummary();
+					Tabs.Jobs.trainTick();
 				},
 				delay     : 250,
 				caller    : 'Tabs.Info.refresh'
@@ -11282,7 +11282,7 @@ Tabs.Waves = {
 	$container		: null,
 	$content		: null,
 	
-	units_type		: ['ArmoredTransport','PackDragon','Conscript','Spy','Halberdsman','Minotaur','Longbowman','SwiftStrikeDragon','BattleDragon','Giant','FireMirror','AquaTroop','StoneTroop','FireTroop','WindTroop','IceTroop', 'FrostGiant', 'SwampTroop', 'ForestTroop', 'DesertTroop'],
+	units_type		: ['ArmoredTransport','PackDragon','Conscript','Spy','Halberdsman','Minotaur','Longbowman','SwiftStrikeDragon','BattleDragon','Giant','FireMirror','DarkSlayer','AquaTroop','StoneTroop','FireTroop','WindTroop','IceTroop', 'FrostGiant', 'SwampTroop', 'ForestTroop', 'DesertTroop'],
 
 	timer			: { 
 		 attack			: null
@@ -12192,7 +12192,7 @@ Tabs.Attacks = {
 	
 	container		: null,
 	
-	units_type 		: ['Porter', 'Conscript', 'Spy', 'Halberdsman', 'Minotaur', 'Longbowman', 'SwiftStrikeDragon', 'BattleDragon', 'ArmoredTransport', 'PackDragon', 'Giant', 'FireMirror', 'AquaTroop', 'StoneTroop', 'FireTroop', 'WindTroop','IceTroop', 'FrostGiant', 'SwampTroop', 'ForestTroop', 'DesertTroop'],
+	units_type 		: ['Porter', 'Conscript', 'Spy', 'Halberdsman', 'Minotaur', 'Longbowman', 'SwiftStrikeDragon', 'BattleDragon', 'ArmoredTransport', 'PackDragon', 'Giant', 'FireMirror', 'DarkSlayer', 'AquaTroop', 'StoneTroop', 'FireTroop', 'WindTroop','IceTroop', 'FrostGiant', 'SwampTroop', 'ForestTroop', 'DesertTroop'],
 	dragons_type	: ['GreatDragon','WaterDragon','StoneDragon','FireDragon','WindDragon','IceDragon', 'SwampDragon', 'ForestDragon', 'DesertDragon', 'SpectralDragon'],
 
 	timer			: {
@@ -13966,13 +13966,13 @@ Tabs.Attacks = {
 			if ( /(Blink|Hop|Skip|Jump|Leap|Bounce|Bore|Bolt|Blast)/.test(name) )  {
 				objAddTo (Data.stats.items.speedups, name, quantity);
 			} 
-			else if ( /(Respirators|Volcanic|Mandrakes|Banshee|Reaper|Scale|Glacial|Titan|DragonEgg)/.test(name) ) {
+			else if ( /(Respirators|Volcanic|Mandrakes|Banshee|Reaper|Scale|Glacial|Titan|Dragonfire|DragonEgg)/.test(name) ) {
 				objAddTo (Data.stats.items.arsenal, name, quantity);
 			} 
 			else if ( /(Helmet|ClawGuards|BodyArmor|TailGuard)/.test(name) ) {
 				objAddTo (Data.stats.items.armors, name, quantity); 
 			}
-			else if ( /(Porter|Conscript|Spy|Halberdsman|Minotaur|Longbowman|SwiftStrikeDragon|BattleDragon|ArmoredTransport|PackDragon|Giant|FireMirror|AquaTroop|StoneTroop|FireTroop|WindTroop|IceTroop|FrostGiant|SwampTroop|ForestTroop|DesertTroop)/.test(name) ) {
+			else if ( /(Porter|Conscript|Spy|Halberdsman|Minotaur|Longbowman|SwiftStrikeDragon|BattleDragon|ArmoredTransport|PackDragon|Giant|FireMirror|AquaTroop|StoneTroop|FireTroop|WindTroop|IceTroop|FrostGiant|SwampTroop|ForestTroop|DesertTroop|DarkSlayer)/.test(name) ) {
 				objAddTo (Data.stats.items.trooops, name, quantity); 
 			}
 			else if ( /(Ticket|Momentary)/.test(name) ) {
@@ -18858,7 +18858,7 @@ $startUpBox = dialogBox({
 
 StepTimeBar.start({ target:$J('#'+UID['startup-progressbar']), steps:4, delay:SCRIPT_STARTUP_DELAY*3 });
 
-setTimeout ( getFlashvars, 45000 );
+setTimeout ( getFlashvars, 5000 );
 
 
 DATA_MAP = 'AAEmSnJ0FWNUEouBelp5cUNRdSJRMYVYFxMkV0RCN2eIOnqGanZqMTcZiYNzNihTKjYXOigXRkqD\
